@@ -14,13 +14,14 @@ ha = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(ha)
 
 
-def agent(status, ws="w1", title="t", tid="term_x"):
+def agent(status, ws="w1", title="t", tid="term_x", pane="w1:p1"):
     return {
         "agent": "claude",
         "agent_status": status,
         "workspace_id": ws,
         "terminal_title_stripped": title,
         "terminal_id": tid,
+        "pane_id": pane,
     }
 
 
@@ -30,46 +31,47 @@ class TestPure(unittest.TestCase):
         self.assertEqual(ha.status_of({}), "unknown")
         self.assertEqual(ha.status_of({"agent_status": "working"}), "working")
 
-    def test_count_by_status(self):
-        ags = [agent("working"), agent("working"), agent("idle")]
-        self.assertEqual(ha.count_by_status(ags), {"working": 2, "idle": 1})
+    def test_stable_sort_by_pane(self):
+        a = agent("working", pane="w8:p1")
+        b = agent("working", pane="w5:p1")
+        got = [x["pane_id"] for x in ha.stable_sort([a, b])]
+        self.assertEqual(got, ["w5:p1", "w8:p1"])
 
-    def test_sort_by_urgency(self):
-        ags = [agent("working"), agent("blocked"), agent("done"), agent("idle")]
-        got = [ha.status_of(a) for a in ha.sort_by_urgency(ags)]
-        self.assertEqual(got, ["blocked", "idle", "done", "working"])
+    def test_agent_line_escapes_and_shows_workspace(self):
+        line = ha.agent_line(agent("idle", ws="w5", title="a & b <x>"))
+        self.assertIn("w5", line)
+        self.assertIn("a &amp; b &lt;x&gt;", line)
 
-    def test_render_text_order_and_nonzero(self):
-        ags = [agent("blocked"), agent("working"), agent("working")]
-        expected = (
-            "<span color='#ed8796'>%s</span> 1"
-            "%s"
-            "<span color='#c6a0f6'>%s</span> 2"
-        ) % (ha.ICONS["blocked"], ha.SEP, ha.ICONS["working"])
-        self.assertEqual(ha.render_text(ags), expected)
+    def test_status_output_working_counts_only_matching(self):
+        agents = [
+            agent("working", pane="w5:p1"),
+            agent("working", pane="w5:p9"),
+            agent("blocked", pane="w6:p1"),
+        ]
+        out = ha.status_output("working", agents)
+        self.assertEqual(out["text"], "<span color='#c6a0f6'>\U000F06A9</span> 2")
+        self.assertEqual(out["class"], ["herdr-agents", "working"])
+        self.assertEqual(len(out["tooltip"].split("\n")), 2)
 
-    def test_render_text_empty(self):
-        self.assertEqual(ha.render_text([]), "")
+    def test_status_output_blocked_single(self):
+        out = ha.status_output("blocked", [agent("blocked", ws="w6", title="fix it")])
+        self.assertEqual(out["text"], "<span color='#ed8796'>\U000F009A</span> 1")
+        self.assertIn("fix it", out["tooltip"])
 
-    def test_build_output_empty(self):
-        out = ha.build_output([])
+    def test_status_output_empty_is_hidden(self):
+        out = ha.status_output("done", [agent("working", pane="w5:p1")])
         self.assertEqual(out["text"], "")
         self.assertIn("empty", out["class"])
 
-    def test_build_output_class_is_top_status(self):
-        out = ha.build_output([agent("working"), agent("blocked")])
-        self.assertEqual(out["class"], ["herdr-agents", "blocked"])
+    def test_state_signature_changes_with_status(self):
+        working = [agent("working", pane="w5:p1")]
+        blocked = [agent("blocked", pane="w5:p1")]
+        self.assertNotEqual(ha.state_signature(working), ha.state_signature(blocked))
 
-    def test_tooltip_escapes_pango(self):
-        tip = ha.render_tooltip([agent("idle", title="a & b <x>")])
-        self.assertIn("a &amp; b &lt;x&gt;", tip)
-
-    def test_picker_lines(self):
-        lines = ha.picker_lines([agent("working", ws="w5", title="Do thing")])
-        self.assertEqual(len(lines), 1)
-        self.assertTrue(lines[0].startswith(ha.ICONS["working"]))
-        self.assertIn("w5", lines[0])
-        self.assertIn("Do thing", lines[0])
+    def test_state_signature_is_order_independent(self):
+        x = agent("working", pane="w5:p1")
+        y = agent("idle", pane="w6:p1")
+        self.assertEqual(ha.state_signature([x, y]), ha.state_signature([y, x]))
 
     def test_pick_herdr_window_prefers_title(self):
         clients = [

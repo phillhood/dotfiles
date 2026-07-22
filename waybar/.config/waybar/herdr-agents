@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """herdr-agents - waybar element for Claude Code / herdr agent status.
 
+One waybar module per status (blocked/idle/done/working/unknown), grouped into
+one card. Each status module shows its icon + count, hides when empty, tooltips
+the agents in that status, and focuses one of them on click.
+
 Subcommands:
-  watch    stream agent status to waybar (continuous exec, event-driven)
-  menu     walker picker of all agents -> focus the chosen one
-  urgent   focus the single most-urgent agent
-  render   print one waybar JSON line and exit (debug / building block)
+  status <name>        emit one status module's JSON (icon + count) and exit
+  focus-status <name>  focus a herdr agent in <name> status (+ raise the window)
+  notify               watch herdr and nudge waybar (RTMIN+SIGNAL) whenever the
+                       set of agents/statuses changes, so the status modules
+                       re-render
 
 Self-contained: all personal choices live in the CONFIG block below, so this
 script can later move to a standalone repo unchanged.
@@ -13,14 +18,12 @@ script can later move to a standalone repo unchanged.
 import json
 import os
 import shutil
-import socket
 import subprocess
 import sys
 import time
 
 # ----------------------------- CONFIG -----------------------------
-# Urgency order, most-urgent first. Drives bar text order, tooltip/picker
-# sort, `urgent`, and the CSS status class.
+# Known statuses, in the left-to-right order the status modules appear.
 URGENCY = ["blocked", "idle", "done", "working", "unknown"]
 
 # Nerd-font glyphs (MesloLGS Nerd Font), by codepoint to avoid paste rot.
@@ -41,15 +44,20 @@ COLORS = {
     "unknown": "#6e738d",  # overlay0
 }
 
-SEP = "  "  # gap between status groups in the bar text
+# waybar signal (SIGRTMIN+SIGNAL) the `notify` watcher raises when the agent
+# state changes; the status modules carry the matching "signal" and re-render.
+SIGNAL = 8
+
+# How often `notify` re-checks herdr. herdr's agent-status events are per-pane
+# (no global "any agent changed" subscription), so a light poll of the cheap
+# local-socket `agent list` is the robust way to catch every change. A nudge is
+# sent only when the state actually differs, so waybar re-renders on real
+# changes, not on a timer.
+POLL_SECONDS = 1.5
 
 HERDR_BIN = (os.environ.get("HERDR_BIN")
              or shutil.which("herdr")
              or os.path.expanduser("~/.local/bin/herdr"))
-
-DEFAULT_SOCKET = os.path.expanduser("~/.config/herdr/herdr.sock")
-
-PICKER_CMD = ["walker", "-d", "-i"]  # dmenu mode, prints selected index
 
 GHOSTTY_CLASS = "com.mitchellh.ghostty"
 HERDR_WINDOW_TITLE = "herdr"
@@ -61,17 +69,10 @@ def status_of(agent):
     return s if s in URGENCY else "unknown"
 
 
-def sort_by_urgency(agents):
-    order = {s: i for i, s in enumerate(URGENCY)}
-    return sorted(agents, key=lambda a: order.get(status_of(a), len(URGENCY)))
-
-
-def count_by_status(agents):
-    counts = {}
-    for a in agents:
-        s = status_of(a)
-        counts[s] = counts.get(s, 0) + 1
-    return counts
+def stable_sort(agents):
+    # Stable, workspace-grouped order (pane_id is "w5:p1") so a status's
+    # first agent - and the tooltip order - don't jump around on status change.
+    return sorted(agents, key=lambda a: a.get("pane_id", ""))
 
 
 def pango_escape(text):
@@ -80,52 +81,25 @@ def pango_escape(text):
                 .replace(">", "&gt;"))
 
 
-def render_text(agents):
-    counts = count_by_status(agents)
-    parts = []
-    for s in URGENCY:
-        n = counts.get(s, 0)
-        if n:
-            parts.append("<span color='%s'>%s</span> %d"
-                         % (COLORS[s], ICONS[s], n))
-    return SEP.join(parts)
+def agent_line(agent):
+    ws = agent.get("workspace_id", "?")
+    title = (agent.get("terminal_title_stripped") or "").strip()
+    return "%s  %s" % (pango_escape(ws), pango_escape(title))
 
 
-def render_tooltip(agents):
-    lines = []
-    for a in sort_by_urgency(agents):
-        s = status_of(a)
-        ws = a.get("workspace_id", "?")
-        title = (a.get("terminal_title_stripped") or "").strip()
-        lines.append("%s %-7s  %s  %s" % (ICONS[s], s, ws, pango_escape(title)))
-    return "\n".join(lines)
+def status_output(name, agents):
+    matching = [a for a in agents if status_of(a) == name]
+    if not matching:
+        return {"text": "", "tooltip": "", "class": ["herdr-agents", name, "empty"]}
+    text = "<span color='%s'>%s</span> %d" % (COLORS[name], ICONS[name], len(matching))
+    tooltip = "\n".join(agent_line(a) for a in stable_sort(matching))
+    return {"text": text, "tooltip": tooltip, "class": ["herdr-agents", name]}
 
 
-def top_status(agents):
-    for s in URGENCY:
-        if any(status_of(a) == s for a in agents):
-            return s
-    return "empty"
-
-
-def build_output(agents):
-    if not agents:
-        return {"text": "", "tooltip": "", "class": ["herdr-agents", "empty"]}
-    return {
-        "text": render_text(agents),
-        "tooltip": render_tooltip(agents),
-        "class": ["herdr-agents", top_status(agents)],
-    }
-
-
-def picker_lines(agents):
-    lines = []
-    for a in sort_by_urgency(agents):
-        s = status_of(a)
-        ws = a.get("workspace_id", "?")
-        title = (a.get("terminal_title_stripped") or "").replace("\n", " ").strip()
-        lines.append("%s %s · %s · %s" % (ICONS[s], s, ws, title))
-    return lines
+def state_signature(agents):
+    # A hashable summary of what the row shows; changes exactly when a status
+    # count or an agent's status changes (order-independent).
+    return tuple(sorted((a.get("pane_id", ""), status_of(a)) for a in agents))
 
 
 def emit(out):
@@ -141,10 +115,6 @@ def fetch_agents():
         return data.get("result", {}).get("agents", []) or []
     except Exception:
         return []
-
-
-def resolve_socket_path():
-    return os.environ.get("HERDR_SOCKET_PATH") or DEFAULT_SOCKET
 
 
 def pick_herdr_window(clients):
@@ -164,9 +134,14 @@ def raise_herdr_window():
         clients = json.loads(p.stdout)
         win = pick_herdr_window(clients)
         if win and win.get("address"):
-            subprocess.run(["hyprctl", "dispatch", "focuswindow",
-                            "address:%s" % win["address"]],
-                           capture_output=True, text=True)
+            # This box runs Hyprland's Lua-config plugin, which evaluates
+            # `hyprctl dispatch <x>` as `hl.dispatch(<x>)`; hl.dsp.focus with a
+            # window selector is the focuswindow equivalent. (Stock hyprlang
+            # Hyprland would instead use: dispatch focuswindow address:<addr>.)
+            subprocess.run(
+                ["hyprctl", "dispatch",
+                 'hl.dsp.focus({window="address:%s"})' % win["address"]],
+                capture_output=True, text=True)
     except Exception:
         pass
 
@@ -182,84 +157,52 @@ def focus_agent(terminal_id):
     raise_herdr_window()
 
 
-def cmd_urgent():
-    agents = sort_by_urgency(fetch_agents())
-    if agents:
-        focus_agent(agents[0].get("terminal_id"))
-
-
-def cmd_menu():
-    agents = sort_by_urgency(fetch_agents())
-    if not agents:
-        return
+def nudge():
     try:
-        p = subprocess.run(PICKER_CMD, input="\n".join(picker_lines(agents)),
-                           capture_output=True, text=True)
-    except FileNotFoundError:
-        return
-    out = p.stdout.strip()
-    if p.returncode != 0 or out == "":
-        return
-    try:
-        idx = int(out)
-    except ValueError:
-        return
-    if 0 <= idx < len(agents):
-        focus_agent(agents[idx].get("terminal_id"))
+        subprocess.run(["pkill", "-RTMIN+%d" % SIGNAL, "waybar"],
+                       capture_output=True)
+    except Exception:
+        pass
 
 
-def cmd_render():
-    emit(build_output(fetch_agents()))
+def cmd_status(name):
+    emit(status_output(name, fetch_agents()))
 
 
-SUBSCRIBE = {
-    "id": 1,
-    "method": "events.subscribe",
-    "params": {"subscriptions": [
-        {"type": "pane.agent_status_changed"},
-        {"type": "pane.agent_detected"},
-        {"type": "pane.created"},
-        {"type": "pane.closed"},
-        {"type": "pane.exited"},
-    ]},
-}
+def cmd_focus_status(name):
+    matching = stable_sort([a for a in fetch_agents() if status_of(a) == name])
+    if matching:
+        focus_agent(matching[0].get("terminal_id"))
 
 
-def cmd_watch():
-    backoff = 1.0
+def cmd_notify():
+    emit({"text": "", "class": ["herdr-agents", "notify"]})  # stay hidden
+    last = None
     while True:
         try:
-            emit(build_output(fetch_agents()))  # current state + post-reconnect refresh
-            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-                s.settimeout(5)
-                s.connect(resolve_socket_path())
-                s.sendall((json.dumps(SUBSCRIBE) + "\n").encode())
-                s.settimeout(None)
-                with s.makefile("r") as stream:
-                    backoff = 1.0
-                    for line in stream:
-                        if line.strip():
-                            emit(build_output(fetch_agents()))
+            sig = state_signature(fetch_agents())
+            if sig != last:
+                last = sig
+                nudge()
         except Exception as exc:
-            sys.stderr.write("herdr-agents watch: %s\n" % exc)
-        time.sleep(backoff)
-        backoff = min(backoff * 2, 5.0)
+            sys.stderr.write("herdr-agents notify: %s\n" % exc)
+        time.sleep(POLL_SECONDS)
 
 
 def main(argv):
-    cmd = argv[1] if len(argv) > 1 else "watch"
-    handlers = {
-        "watch": cmd_watch,
-        "menu": cmd_menu,
-        "urgent": cmd_urgent,
-        "render": cmd_render,
-    }
-    fn = handlers.get(cmd)
-    if fn is None:
-        sys.stderr.write("usage: herdr-agents {watch|menu|urgent|render}\n")
-        return 2
-    fn()
-    return 0
+    cmd = argv[1] if len(argv) > 1 else "notify"
+    if cmd == "status" and len(argv) > 2:
+        cmd_status(argv[2])
+        return 0
+    if cmd == "focus-status" and len(argv) > 2:
+        cmd_focus_status(argv[2])
+        return 0
+    if cmd == "notify":
+        cmd_notify()
+        return 0
+    sys.stderr.write(
+        "usage: herdr-agents {status <name>|focus-status <name>|notify}\n")
+    return 2
 
 
 if __name__ == "__main__":

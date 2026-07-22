@@ -16,7 +16,7 @@
   ],
   "modules-right": [
     "group/tray-box",
-    "custom/herdragents",
+    "group/herdr-agents",
     "group/system-box",
     "group/clock-box",
     "group/power-box"
@@ -58,6 +58,17 @@
     "orientation": "inherit",
     "modules": [
       "tray"
+    ]
+  },
+  "group/herdr-agents": {
+    "orientation": "inherit",
+    "modules": [
+      "custom/herdr-agents-notify",
+      "custom/herdr-blocked",
+      "custom/herdr-idle",
+      "custom/herdr-done",
+      "custom/herdr-working",
+      "custom/herdr-unknown"
     ]
   },
   "group/system-box": {
@@ -217,15 +228,59 @@
     "spacing": 4,
     "reverse-direction": true
   },
-  // -- herdr agents --
-  "custom/herdragents": {
-    "exec": "~/.config/waybar/herdr-agents watch",
+  // -- herdr agents (one module per status; hidden notify watcher subscribes to
+  //    herdr events and signals the status modules to re-render, RTMIN+8) --
+  "custom/herdr-agents-notify": {
+    "exec": "~/.config/waybar/herdr-agents notify",
+    "return-type": "json",
+    "format": "{}",
+    "hide-empty-text": true,
+    "tooltip": false
+  },
+  "custom/herdr-blocked": {
+    "exec": "~/.config/waybar/herdr-agents status blocked",
     "return-type": "json",
     "format": "{}",
     "hide-empty-text": true,
     "tooltip": true,
-    "on-click": "~/.config/waybar/herdr-agents menu",
-    "on-click-right": "~/.config/waybar/herdr-agents urgent"
+    "signal": 8,
+    "on-click": "~/.config/waybar/herdr-agents focus-status blocked"
+  },
+  "custom/herdr-idle": {
+    "exec": "~/.config/waybar/herdr-agents status idle",
+    "return-type": "json",
+    "format": "{}",
+    "hide-empty-text": true,
+    "tooltip": true,
+    "signal": 8,
+    "on-click": "~/.config/waybar/herdr-agents focus-status idle"
+  },
+  "custom/herdr-done": {
+    "exec": "~/.config/waybar/herdr-agents status done",
+    "return-type": "json",
+    "format": "{}",
+    "hide-empty-text": true,
+    "tooltip": true,
+    "signal": 8,
+    "on-click": "~/.config/waybar/herdr-agents focus-status done"
+  },
+  "custom/herdr-working": {
+    "exec": "~/.config/waybar/herdr-agents status working",
+    "return-type": "json",
+    "format": "{}",
+    "hide-empty-text": true,
+    "tooltip": true,
+    "signal": 8,
+    "on-click": "~/.config/waybar/herdr-agents focus-status working"
+  },
+  "custom/herdr-unknown": {
+    "exec": "~/.config/waybar/herdr-agents status unknown",
+    "return-type": "json",
+    "format": "{}",
+    "hide-empty-text": true,
+    "tooltip": true,
+    "signal": 8,
+    "on-click": "~/.config/waybar/herdr-agents focus-status unknown"
   },
   // -- system: cpu / memory --
   "cpu": {

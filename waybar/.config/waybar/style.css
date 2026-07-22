@@ -65,7 +65,7 @@ window#waybar {
 #tray-box,
 #clock-box,
 #power-box,
-#custom-herdragents,
+#herdr-agents,
 #custom-cava {
   border-radius: 4px;
   /* border: 1.5px solid @mauve; */
@@ -168,10 +168,19 @@ window#waybar.empty #mpris {
   padding: 2px 0px;
 }
 
-/* Module: herdr agents */
-#custom-herdragents {
+/* Container: herdr agents (one card; one module per status, hidden when empty).
+   Padding lives on the child modules (not the group) so the whole card
+   collapses to nothing when every status is empty. */
+#herdr-agents {
   margin: 0px 4px 2px 2px;
-  padding: 2px 11px;
+  padding: 0px;
+}
+
+#herdr-agents label,
+#herdr-agents > widget > label,
+#herdr-agents > widget {
+  padding: 2px 7px;
+  margin: 0px;
   color: @fg;
   font-weight: 900;
   font-size: 14px;
