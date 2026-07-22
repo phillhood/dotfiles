@@ -162,20 +162,23 @@ def raise_herdr_window():
         p = subprocess.run(["hyprctl", "-j", "clients"],
                            capture_output=True, text=True, timeout=3)
         clients = json.loads(p.stdout)
+        win = pick_herdr_window(clients)
+        if win and win.get("address"):
+            subprocess.run(["hyprctl", "dispatch", "focuswindow",
+                            "address:%s" % win["address"]],
+                           capture_output=True, text=True)
     except Exception:
-        return
-    win = pick_herdr_window(clients)
-    if win and win.get("address"):
-        subprocess.run(["hyprctl", "dispatch", "focuswindow",
-                        "address:%s" % win["address"]],
-                       capture_output=True, text=True)
+        pass
 
 
 def focus_agent(terminal_id):
     if not terminal_id:
         return
-    subprocess.run([HERDR_BIN, "agent", "focus", terminal_id],
-                   capture_output=True, text=True)
+    try:
+        subprocess.run([HERDR_BIN, "agent", "focus", terminal_id],
+                       capture_output=True, text=True)
+    except Exception:
+        pass
     raise_herdr_window()
 
 
