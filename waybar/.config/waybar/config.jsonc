@@ -14,9 +14,11 @@
     "group/media-box",
     "group/cava-box"
   ],
+  "modules-center": [
+    "group/herdr-agents"
+  ],
   "modules-right": [
     "group/tray-box",
-    "group/herdr-agents",
     "group/system-box",
     "group/clock-box",
     "group/power-box"
