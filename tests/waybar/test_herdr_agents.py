@@ -71,6 +71,23 @@ class TestPure(unittest.TestCase):
         self.assertIn("w5", lines[0])
         self.assertIn("Do thing", lines[0])
 
+    def test_pick_herdr_window_prefers_title(self):
+        clients = [
+            {"title": "nvim", "class": "com.mitchellh.ghostty", "address": "0x1"},
+            {"title": "herdr", "class": "com.mitchellh.ghostty", "address": "0x2"},
+        ]
+        self.assertEqual(ha.pick_herdr_window(clients)["address"], "0x2")
+
+    def test_pick_herdr_window_falls_back_to_class(self):
+        clients = [
+            {"title": "nvim", "class": "com.mitchellh.ghostty", "address": "0x1"},
+            {"title": "firefox", "class": "firefox", "address": "0x9"},
+        ]
+        self.assertEqual(ha.pick_herdr_window(clients)["address"], "0x1")
+
+    def test_pick_herdr_window_none(self):
+        self.assertIsNone(ha.pick_herdr_window([{"title": "x", "class": "y"}]))
+
 
 if __name__ == "__main__":
     unittest.main()

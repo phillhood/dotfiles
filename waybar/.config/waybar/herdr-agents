@@ -147,6 +147,44 @@ def resolve_socket_path():
     return os.environ.get("HERDR_SOCKET_PATH") or DEFAULT_SOCKET
 
 
+def pick_herdr_window(clients):
+    for c in clients:
+        if c.get("title") == HERDR_WINDOW_TITLE:
+            return c
+    for c in clients:
+        if c.get("class") == GHOSTTY_CLASS:
+            return c
+    return None
+
+
+def raise_herdr_window():
+    try:
+        p = subprocess.run(["hyprctl", "-j", "clients"],
+                           capture_output=True, text=True, timeout=3)
+        clients = json.loads(p.stdout)
+    except Exception:
+        return
+    win = pick_herdr_window(clients)
+    if win and win.get("address"):
+        subprocess.run(["hyprctl", "dispatch", "focuswindow",
+                        "address:%s" % win["address"]],
+                       capture_output=True, text=True)
+
+
+def focus_agent(terminal_id):
+    if not terminal_id:
+        return
+    subprocess.run([HERDR_BIN, "agent", "focus", terminal_id],
+                   capture_output=True, text=True)
+    raise_herdr_window()
+
+
+def cmd_urgent():
+    agents = sort_by_urgency(fetch_agents())
+    if agents:
+        focus_agent(agents[0].get("terminal_id"))
+
+
 def cmd_render():
     emit(build_output(fetch_agents()))
 
@@ -189,6 +227,7 @@ def main(argv):
     cmd = argv[1] if len(argv) > 1 else "watch"
     handlers = {
         "watch": cmd_watch,
+        "urgent": cmd_urgent,
         "render": cmd_render,
     }
     fn = handlers.get(cmd)
