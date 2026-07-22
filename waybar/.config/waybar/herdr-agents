@@ -151,9 +151,46 @@ def cmd_render():
     emit(build_output(fetch_agents()))
 
 
+SUBSCRIBE = {
+    "id": 1,
+    "method": "events.subscribe",
+    "params": {"subscriptions": [
+        {"type": "pane.agent_status_changed"},
+        {"type": "pane.agent_detected"},
+        {"type": "pane.created"},
+        {"type": "pane.closed"},
+        {"type": "pane.exited"},
+    ]},
+}
+
+
+def cmd_watch():
+    backoff = 1.0
+    while True:
+        emit(build_output(fetch_agents()))  # show current state immediately
+        try:
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+                s.settimeout(5)
+                s.connect(resolve_socket_path())
+                s.sendall((json.dumps(SUBSCRIBE) + "\n").encode())
+                s.settimeout(None)
+                stream = s.makefile("r")
+                backoff = 1.0
+                for line in stream:
+                    if not line.strip():
+                        continue
+                    emit(build_output(fetch_agents()))
+        except Exception:
+            pass
+        emit(build_output(fetch_agents()))  # connection lost -> refresh
+        time.sleep(backoff)
+        backoff = min(backoff * 2, 5.0)
+
+
 def main(argv):
     cmd = argv[1] if len(argv) > 1 else "watch"
     handlers = {
+        "watch": cmd_watch,
         "render": cmd_render,
     }
     fn = handlers.get(cmd)
