@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+"""herdr-agents - waybar element for Claude Code / herdr agent status.
+
+Subcommands:
+  watch    stream agent status to waybar (continuous exec, event-driven)
+  menu     walker picker of all agents -> focus the chosen one
+  urgent   focus the single most-urgent agent
+  render   print one waybar JSON line and exit (debug / building block)
+
+Self-contained: all personal choices live in the CONFIG block below, so this
+script can later move to a standalone repo unchanged.
+"""
+import json
+import os
+import shutil
+import socket
+import subprocess
+import sys
+import time
+
+# ----------------------------- CONFIG -----------------------------
+# Urgency order, most-urgent first. Drives bar text order, tooltip/picker
+# sort, `urgent`, and the CSS status class.
+URGENCY = ["blocked", "idle", "done", "working", "unknown"]
+
+# Nerd-font glyphs (MesloLGS Nerd Font), by codepoint to avoid paste rot.
+ICONS = {
+    "blocked": "\U000F009A",  # md-bell
+    "idle":    "\U000F0134",  # md-check-bold
+    "done":    "\U000F05E0",  # md-check-circle
+    "working": "\U000F06A9",  # md-robot
+    "unknown": "\U000F02D7",  # md-help-circle
+}
+
+# Catppuccin Macchiato.
+COLORS = {
+    "blocked": "#ed8796",  # red
+    "idle":    "#a6da95",  # green
+    "done":    "#8bd5ca",  # teal
+    "working": "#c6a0f6",  # mauve
+    "unknown": "#6e738d",  # overlay0
+}
+
+SEP = "  "  # gap between status groups in the bar text
+
+HERDR_BIN = (os.environ.get("HERDR_BIN")
+             or shutil.which("herdr")
+             or os.path.expanduser("~/.local/bin/herdr"))
+
+DEFAULT_SOCKET = os.path.expanduser("~/.config/herdr/herdr.sock")
+
+PICKER_CMD = ["walker", "-d", "-i"]  # dmenu mode, prints selected index
+
+GHOSTTY_CLASS = "com.mitchellh.ghostty"
+HERDR_WINDOW_TITLE = "herdr"
+# ------------------------------------------------------------------
+
+
+def status_of(agent):
+    s = agent.get("agent_status") or "unknown"
+    return s if s in URGENCY else "unknown"
+
+
+def sort_by_urgency(agents):
+    order = {s: i for i, s in enumerate(URGENCY)}
+    return sorted(agents, key=lambda a: order.get(status_of(a), len(URGENCY)))
+
+
+def count_by_status(agents):
+    counts = {}
+    for a in agents:
+        s = status_of(a)
+        counts[s] = counts.get(s, 0) + 1
+    return counts
+
+
+def pango_escape(text):
+    return (text.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;"))
+
+
+def render_text(agents):
+    counts = count_by_status(agents)
+    parts = []
+    for s in URGENCY:
+        n = counts.get(s, 0)
+        if n:
+            parts.append("<span color='%s'>%s</span> %d"
+                         % (COLORS[s], ICONS[s], n))
+    return SEP.join(parts)
+
+
+def render_tooltip(agents):
+    lines = []
+    for a in sort_by_urgency(agents):
+        s = status_of(a)
+        ws = a.get("workspace_id", "?")
+        title = (a.get("terminal_title_stripped") or "").strip()
+        lines.append("%s %-7s  %s  %s" % (ICONS[s], s, ws, pango_escape(title)))
+    return "\n".join(lines)
+
+
+def top_status(agents):
+    for s in URGENCY:
+        if any(status_of(a) == s for a in agents):
+            return s
+    return "empty"
+
+
+def build_output(agents):
+    if not agents:
+        return {"text": "", "tooltip": "", "class": ["herdr-agents", "empty"]}
+    return {
+        "text": render_text(agents),
+        "tooltip": render_tooltip(agents),
+        "class": ["herdr-agents", top_status(agents)],
+    }
+
+
+def picker_lines(agents):
+    lines = []
+    for a in sort_by_urgency(agents):
+        s = status_of(a)
+        ws = a.get("workspace_id", "?")
+        title = (a.get("terminal_title_stripped") or "").replace("\n", " ").strip()
+        lines.append("%s %s · %s · %s" % (ICONS[s], s, ws, title))
+    return lines
+
+
+def emit(out):
+    sys.stdout.write(json.dumps(out) + "\n")
+    sys.stdout.flush()
+
+
+def fetch_agents():
+    try:
+        p = subprocess.run([HERDR_BIN, "agent", "list"],
+                           capture_output=True, text=True, timeout=3)
+        data = json.loads(p.stdout)
+        return data.get("result", {}).get("agents", []) or []
+    except Exception:
+        return []
+
+
+def resolve_socket_path():
+    return os.environ.get("HERDR_SOCKET_PATH") or DEFAULT_SOCKET
+
+
+def cmd_render():
+    emit(build_output(fetch_agents()))
+
+
+def main(argv):
+    cmd = argv[1] if len(argv) > 1 else "watch"
+    handlers = {
+        "render": cmd_render,
+    }
+    fn = handlers.get(cmd)
+    if fn is None:
+        sys.stderr.write("usage: herdr-agents {watch|menu|urgent|render}\n")
+        return 2
+    fn()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
