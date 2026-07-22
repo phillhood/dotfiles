@@ -16,6 +16,7 @@
   ],
   "modules-right": [
     "group/tray-box",
+    "custom/herdragents",
     "group/system-box",
     "group/clock-box",
     "group/power-box"
@@ -215,6 +216,16 @@
     "icon-size": 14,
     "spacing": 4,
     "reverse-direction": true
+  },
+  // -- herdr agents --
+  "custom/herdragents": {
+    "exec": "~/.config/waybar/herdr-agents watch",
+    "return-type": "json",
+    "format": "{}",
+    "hide-empty-text": true,
+    "tooltip": true,
+    "on-click": "~/.config/waybar/herdr-agents menu",
+    "on-click-right": "~/.config/waybar/herdr-agents urgent"
   },
   // -- system: cpu / memory --
   "cpu": {

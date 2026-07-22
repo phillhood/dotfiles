@@ -65,6 +65,7 @@ window#waybar {
 #tray-box,
 #clock-box,
 #power-box,
+#custom-herdragents,
 #custom-cava {
   border-radius: 4px;
   /* border: 1.5px solid @mauve; */
@@ -165,6 +166,15 @@ window#waybar.empty #mpris {
 #power-box {
   margin: 0px 4px 2px 2px;
   padding: 2px 0px;
+}
+
+/* Module: herdr agents */
+#custom-herdragents {
+  margin: 0px 4px 2px 2px;
+  padding: 2px 11px;
+  color: @fg;
+  font-weight: 900;
+  font-size: 14px;
 }
 
 #tray-box label,
