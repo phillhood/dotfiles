@@ -4,6 +4,13 @@ ssh/.ssh/id_*
 ssh/.ssh/*_key
 ssh/.ssh/*.pem
 ssh/.ssh/known_hosts*
+# ~/.gitignore_global has a bare `.claude`, which (being unanchored) matches this
+# package's own directory and hides every file in it — files still get stowed, so
+# a fresh clone silently lacks them. Re-include the directory for this repo only.
+# The trailing slash matches directories only, so the per-file guards below still
+# win regardless of ordering. Verified with `git check-ignore`.
+!claude/.claude/
+
 # claude package: credentials and per-user/runtime state
 claude/.claude/.credentials.json
 claude/.claude/history.jsonl

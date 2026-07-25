@@ -79,6 +79,7 @@ alias pyr='uv run'
 alias pip='uv pip'
 alias loadenv="setopt allexport ; . ./.env ; unsetopt allexport"
 alias loadenv-staging="setopt allexport ; . ./.env.staging ; unsetopt allexport"
+alias edit="spiceedit"
 # Kubernetes
 alias k='kubectl'
 alias kctx='kubectx'

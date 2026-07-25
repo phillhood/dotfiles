@@ -122,23 +122,20 @@ hl.config({
 ---- WINDOW RULES   ----
 ------------------------
 
--- Hide the Wine/XEmbed systray icon windows (empty class+title, XWayland) in place:
--- xembedsniproxy proxies them to the tray, but the X11 window re-shows as a black box
--- on click. Dynamic opacity/no_blur re-hide it each time (a static rule fires only once).
--- CAUTION: this matcher (empty class+title, floating, XWayland) also matches NATIVE
--- X11 popup menus -- Electron's Menu.popup() etc. are override-redirect windows with
--- no class or title, so they get opacity 0 + no_focus and dismiss instantly. Only
--- bites apps that use native menus AND run on XWayland (Fastmail did; Discord and
--- Spotify are fine on XWayland because they draw menus in-page as HTML). Fix by
--- keeping such apps on native Wayland, not by narrowing this rule -- Hyprland has no
--- size/pid matcher that could separate a Wine tray icon from a popup menu.
+-- Hide xembedsniproxy's XEmbed container: a real 32x32 X11 window with a solid black
+-- background, one per proxied Wine/Battle.net tray icon. On click xembedsniproxy MOVES
+-- it under the cursor on purpose, so the synthetic click lands on Wine's icon -- it has
+-- to stay mapped and clickable, so hide it with opacity rather than unmapping it.
+-- Dynamic opacity/no_blur re-hide it each time (a static rule fires only once).
+-- Match on class, NOT empty class+title: xembedsniproxy >=6.7.2 sets WM_CLASS on the
+-- container. The old empty-matcher also caught native X11 popup menus (Electron's
+-- Menu.popup() is override-redirect with no class/title) and dismissed them instantly;
+-- an exact class match cannot. Keep >=6.7.2 -- on 6.5.5 the container has no WM_CLASS
+-- and this rule silently stops matching.
 hl.window_rule({
 	name = "hide-wine-tray-bar",
 	match = {
-		class = "^$",
-		title = "^$",
-		float = true,
-		xwayland = true,
+		class = "^xembedsniproxy$",
 	},
 	opacity = 0.0,
 	no_blur = true,
@@ -183,9 +180,25 @@ hl.window_rule({
 	opacity = "1.0 override",
 })
 
+hl.window_rule({
+	match = { class = "^net-runelite-client-RuneLite$" },
+	opacity = "1.0 override",
+})
+
 ------------------------
 ----  LAYER RULES   ----
 ------------------------
+
+-- Frosted-glass blur behind waybar's semi-transparent module cards so text
+-- stays readable over busy windows/wallpaper. ignore_alpha keeps the blur off
+-- the fully-transparent gaps between modules (only the ~0.4+ alpha cards blur;
+-- the module text/icons render on top and stay sharp).
+hl.layer_rule({
+	name = "waybar-blur",
+	match = "waybar",
+	blur = true,
+	ignore_alpha = 0.4,
+})
 
 --------------------
 ----  PROGRAMS  ----
