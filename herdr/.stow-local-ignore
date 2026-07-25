@@ -1,0 +1,7 @@
+# Replaces stow's default ignore list for this package only.
+# `herdr config reset-keys` drops config.toml.bak-keybind-v2-<epoch> beside the
+# config; without this, stow would symlink that stray backup into ~/.config/herdr.
+# Patterns are Perl regexes anchored at BOTH ends and matched per path segment,
+# so a bare `\.bak.*$` would never match `config.toml.bak-...` — hence `.*`.
+.*\.bak.*
+\.stow-local-ignore

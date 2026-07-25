@@ -25,6 +25,15 @@ claude/.claude/plugins/
 hypr/.config/hypr/plugins/
 # waybar keeps old config snapshots
 waybar/.config/waybar/backup/
+# herdr rewrites sockets/logs/session state beside its config; only config.toml is tracked
+herdr/.config/herdr/*.log
+herdr/.config/herdr/*.sock
+herdr/.config/herdr/session.json
+herdr/.config/herdr/release-notes.json
+herdr/.config/herdr/.plugins.lock
+# `herdr config reset-keys` writes config.toml.bak-keybind-v2-<epoch>, which the
+# generic *.bak rule above does not match (it is not a .bak suffix)
+herdr/.config/herdr/*.bak*
 # editor/backup copies anywhere
 *.bak
 

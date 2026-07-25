@@ -28,11 +28,20 @@ config immediately — the deployed files are symlinks back into this repo.
 | `btop`      | `~/.config/btop/*`                                              |
 | `cava`      | `~/.config/cava/*`                                              |
 | `fastfetch` | `~/.config/fastfetch/*`                                         |
+| `herdr`     | `~/.config/herdr/config.toml`, `~/.local/bin/herdr-confirm-close-pane` |
 
-`hypr/.config/hypr/plugins/`, `waybar/.config/waybar/backup/`, and `*.bak` are gitignored, so they
-never enter the repo and stow never links them. That's git-level, not stow-level — there are no
-`.stow-local-ignore` files, and stow's built-in ignore list doesn't cover `*.bak`, so a stray `.bak`
-left inside a package dir would still be symlinked by `make stow`.
+`hypr/.config/hypr/plugins/`, `waybar/.config/waybar/backup/`, herdr's sockets/logs/session state, and
+`*.bak` are gitignored, so they never enter the repo. That's git-level, not stow-level — gitignore
+does not stop stow, and stow's
+built-in ignore list doesn't cover `*.bak`, so a stray `.bak` left inside a package dir is still
+symlinked by `make stow`. The one exception is `herdr/.stow-local-ignore`, which blocks the
+`config.toml.bak-keybind-v2-<epoch>` files `herdr config reset-keys` leaves behind. Note its patterns
+are anchored at both ends and matched per path segment, so `.*\.bak.*` is required — `\.bak.*$` matches
+nothing. A `.stow-local-ignore` also *replaces* stow's default ignore list for that package.
+
+The `herdr` package is additionally reached via `HERDR_CONFIG_PATH` (exported in `zsh/.zshrc`), which
+points herdr straight at the repo copy. The stowed symlink stays as a fallback for any herdr started
+without that variable; both routes resolve to the same file, so they cannot diverge.
 
 Repo-only (not stowed): `tools/` — terminal colour-scheme tooling in `tools/terminals/`, plus
 `tools/canonical/` (reference configs a tool rewrites live — e.g. `.claude/settings.json` — applied by

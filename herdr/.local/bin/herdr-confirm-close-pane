@@ -1,0 +1,89 @@
+#!/bin/sh
+# Confirmation guard for herdr's shift+alt+w close-pane chord.
+# Bound as a [[keys.command]] popup, which is where herdr exports
+# HERDR_ACTIVE_PANE_ID / HERDR_BIN_PATH (a normal pane only gets HERDR_PANE_ID).
+
+pane=${HERDR_ACTIVE_PANE_ID:-$HERDR_PANE_ID}
+herdr=${HERDR_BIN_PATH:-herdr}
+
+if [ -z "$pane" ]; then
+	printf 'no active pane to close\n'
+	sleep 2
+	exit 1
+fi
+
+# catppuccin macchiato, matching ui.accent in config.toml
+if { [ -t 1 ] || [ -n "$HERDR_CONFIRM_FORCE_COLOR" ]; } && [ -z "$NO_COLOR" ]; then
+	accent='\033[1;38;2;198;160;246m'
+	text='\033[38;2;202;211;245m'
+	dim='\033[38;2;110;115;141m'
+	yellow='\033[38;2;238;212;159m'
+	red='\033[38;2;237;135;150m'
+	green='\033[38;2;166;218;149m'
+	cap_y='\033[48;2;198;160;246;38;2;30;32;48m y \033[0m'
+	cap_n='\033[48;2;73;77;100;38;2;202;211;245m esc \033[0m'
+	reset='\033[0m'
+else
+	accent='' text='' dim='' yellow='' red='' green='' reset=''
+	cap_y='[y]' cap_n='[esc]'
+fi
+
+cols=$(stty size 2>/dev/null | cut -d' ' -f2)
+[ -n "$cols" ] || cols=${COLUMNS:-52}
+inner=$((cols - 4))
+[ "$inner" -gt 12 ] || inner=12
+
+# truncate to a character count (gawk is multibyte-aware; cut -c is not)
+fit() {
+	awk -v w="$inner" -v s="$1" 'BEGIN {
+		if (length(s) > w) s = substr(s, 1, w - 1) "…"
+		print s
+	}'
+}
+
+agent='' status='' title='' cwd=''
+if command -v jq >/dev/null 2>&1; then
+	info=$("$herdr" pane get "$pane" 2>/dev/null)
+	agent=$(printf '%s' "$info" | jq -r '.result.pane.agent // ""' 2>/dev/null)
+	status=$(printf '%s' "$info" | jq -r '.result.pane.agent_status // ""' 2>/dev/null)
+	title=$(printf '%s' "$info" | jq -r '.result.pane.terminal_title_stripped // ""' 2>/dev/null)
+	cwd=$(printf '%s' "$info" | jq -r '.result.pane.cwd // ""' 2>/dev/null)
+	case "$cwd" in "$HOME"*) cwd="~${cwd#"$HOME"}" ;; esac
+fi
+[ -n "$agent" ] || agent='shell'
+
+case "$status" in
+working) dot=$yellow ;;
+blocked) dot=$red ;;
+idle | done) dot=$green ;;
+*) dot=$dim ;;
+esac
+
+printf '\033[2J\033[H\033[?25l'
+trap 'printf "\033[?25h\n"' EXIT INT TERM
+
+printf '\n  %bClose pane%b  %b%s%b\n\n' "$accent" "$reset" "$dim" "$pane" "$reset"
+
+if [ -n "$status" ]; then
+	printf '  %b●%b %b%s%b %b· %s%b\n' "$dot" "$reset" "$text" "$agent" "$reset" "$dim" "$status" "$reset"
+else
+	printf '  %b●%b %b%s%b\n' "$dot" "$reset" "$text" "$agent" "$reset"
+fi
+[ -n "$title" ] && printf '    %b%s%b\n' "$text" "$(fit "$title")" "$reset"
+[ -n "$cwd" ] && printf '    %b%s%b\n' "$dim" "$(fit "$cwd")" "$reset"
+
+printf '\n  %b %bclose    %b %bcancel%b  ' "$cap_y" "$dim" "$cap_n" "$dim" "$reset"
+
+# single keypress, no enter, falling back to a line read without a tty
+if stty_saved=$(stty -g 2>/dev/null); then
+	stty raw -echo 2>/dev/null
+	reply=$(dd bs=1 count=1 2>/dev/null)
+	stty "$stty_saved" 2>/dev/null
+else
+	read -r reply
+fi
+
+case "$reply" in
+y | Y) exec "$herdr" pane close "$pane" ;;
+*) exit 0 ;;
+esac
