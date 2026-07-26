@@ -41,6 +41,16 @@ If you can't understand a unit without reading its internals, or can't change it
 
 Prefer small focused files. A file that has grown large is usually doing too much — and edits are more reliable in files that fit in context at once.
 
+## New projects
+
+A greenfield repo has no conventions to match, so whatever the first few files do becomes the convention by accident. Settle the ones that bind every later task before planning, and record them in the spec — they become the plan's Global Constraints, which every task and every reviewer inherits.
+
+Ask about them together, once, rather than as each comes up:
+
+- **Doc comments** — the language's standard form on the public API, none, or enforced by a linter. Recommend the ecosystem's default: Go and Rust expect documented exports, a published library in any language does, an internal app or a script usually doesn't.
+- Test framework and test layout
+- Formatter and linter, and whether they run in CI
+
 ## Existing codebases
 
 Explore the structure before proposing changes, and follow the patterns already there. Where existing code genuinely obstructs the work — a tangled file you have to touch, an unclear boundary — fold a targeted fix into the design. Don't propose unrelated refactoring.

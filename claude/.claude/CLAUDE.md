@@ -26,6 +26,14 @@
 - Error and assert messages must not cite a file path — the file gets moved and the message becomes a dangling pointer in failure output.
 - Applies to code blocks inside plans and specs too, since those get pasted verbatim.
 
+# Doc comments
+- Doc comments (JSDoc/TSDoc, docstrings, rustdoc, godoc) are interface contracts consumed by tooling — IDE hover, generated docs, and in plain JS the type checker. They are not commentary, and the zero-comment rule above does not govern them.
+- Match what the repo already does — check before writing. Where a linter enforces a style, follow that style exactly.
+- Public and exported surface only. Internal helpers don't get them.
+- Say only what the signature can't: units, ranges and invariants, what it throws and when, side effects and mutation, a non-obvious example, deprecation and its replacement.
+- Never restate the signature. `/** Gets the name. @returns The name. */` on `getName(): string` is noise — delete it. That failure is what gives doc comments their bad name, and it's the same disease as narrating a block of code.
+- A new project has no convention to match, so establish one explicitly and record it in the spec rather than letting the first few files settle it by accident.
+
 # Shell tools
 - `grep` on this machine is **ripgrep**, not GNU grep. Adjust flags accordingly.
   - Patterns are regex by default — **never pass `-E`**. In rg, `-E` means `--encoding` and fails with `unknown encoding: <your pattern>`.
