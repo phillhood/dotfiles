@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Inject the workflow routing map into every session.
+# Payload lives in context.md so it can be edited without touching escaping.
+set -euo pipefail
+
+dir="$(cd "$(dirname "$0")" && pwd)"
+payload="$dir/context.md"
+[ -r "$payload" ] || exit 0
+
+wrap='{hookSpecificOutput:{hookEventName:"SessionStart",additionalContext:.}}'
+
+if command -v jq >/dev/null 2>&1; then
+  jq -Rs "$wrap" < "$payload"
+elif command -v python3 >/dev/null 2>&1; then
+  python3 -c 'import json,sys
+print(json.dumps({"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":sys.stdin.read()}}))' < "$payload"
+else
+  exit 0
+fi

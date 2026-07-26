@@ -1,0 +1,17 @@
+{
+  "name": "workflow",
+  "description": "Spec to plan to implementation workflow skills, with debugging, TDD, verification and review-handling discipline",
+  "version": "1.0.0",
+  "author": {
+    "name": "Phill Hood",
+    "email": "phill@phillhood.ca"
+  },
+  "keywords": [
+    "workflow",
+    "spec",
+    "plan",
+    "tdd",
+    "debugging",
+    "review"
+  ]
+}

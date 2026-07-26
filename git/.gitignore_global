@@ -29,6 +29,6 @@ __pycache__/
 node_modules/
 
 **/.claude/settings.local.json
-.docs/
-.dev/
+.docs
+.dev
 .claude
