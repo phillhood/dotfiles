@@ -29,6 +29,7 @@ Otherwise ask before creating one, unless the user has already said to use workt
 
 ```bash
 MAIN=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")
+mkdir -p "$MAIN/.dev" "$MAIN/.docs"
 ln -s "$MAIN/.dev" .dev
 ln -s "$MAIN/.docs" .docs
 ```
