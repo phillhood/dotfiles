@@ -7,7 +7,7 @@ description: Use when an approved spec or written requirements exist and work is
 
 Write the plan for an engineer who is skilled but knows nothing about this codebase, this toolset, or this problem domain. Everything they need goes in the plan: which files, what code, how to test it, what to check.
 
-Save to `.dev/plan/YYYY-MM-DD-<feature>.md`.
+Save to `.dev/plan/YYYY-MM-DD-<feature>.md`. That tree is gitignored — the plan is local state, not a commit.
 
 ## Before writing tasks
 

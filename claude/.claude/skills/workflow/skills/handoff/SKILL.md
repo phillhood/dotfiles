@@ -9,7 +9,7 @@ Write the document the next reader opens first. Assume they have none of this se
 
 Write one when work crosses a boundary — a new session tomorrow, a different repo, a handover to Codex or to a person. **Not** for mid-task context pressure: compaction carries that, and stopping early to hand off wastes the run.
 
-Save to `.dev/handoff/YYYY-MM-DD-<topic>.md`.
+Save to `.dev/handoff/YYYY-MM-DD-<topic>.md`. That tree is gitignored, so the next session reads it off the local checkout — a handoff never travels in a commit or a PR.
 
 ## Sections
 

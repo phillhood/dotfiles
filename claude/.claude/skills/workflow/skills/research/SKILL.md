@@ -19,7 +19,7 @@ Where a secondary source is the only one available, say so explicitly and mark t
 
 ## Output
 
-One file. Fold it into the `.docs/` file that already owns the topic if there is one; otherwise create `.docs/<topic>.md` and say where you put it.
+One file. Fold it into the `.docs/` file that already owns the topic if there is one; otherwise create `.docs/<topic>.md` and say where you put it. That tree is gitignored — don't commit it.
 
 Structure it as: the question, what you found, and the open gaps. Group findings by claim, each with its source inline — not a bibliography at the bottom that nobody maps back.
 

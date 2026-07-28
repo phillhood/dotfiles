@@ -15,5 +15,8 @@ Workflow skills are available:
 Artifacts: .dev/spec/, .dev/plan/, .dev/implementation/, .dev/handoff/
 Durable docs: .docs/
 
+Both trees are gitignored local state — write them, never commit them, and
+never count them as part of a diff or PR.
+
 **Reach for workflow:spec before building something new — including when it
 looks small.** Don't write code against a design you haven't shown the user.

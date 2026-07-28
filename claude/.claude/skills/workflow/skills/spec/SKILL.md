@@ -18,7 +18,7 @@ Create a todo per step.
 3. **Ask one question per message.** Purpose, constraints, success criteria. Multiple choice where it fits, open-ended where it doesn't.
 4. **Offer 2-3 approaches** with trade-offs. Lead with your recommendation and say why. Cut anything YAGNI.
 5. **Present the design in sections**, each scaled to its complexity — a sentence where it's obvious, a few hundred words where it isn't. Ask after each whether it holds. Cover architecture, components, data flow, error handling, testing.
-6. **Write it to `.dev/spec/YYYY-MM-DD-<topic>.md`** and commit.
+6. **Write it to `.dev/spec/YYYY-MM-DD-<topic>.md`.** That tree is gitignored — nothing here gets committed.
 7. **Self-review the file, fix inline:** placeholders and TBDs, sections that contradict each other, scope that needs splitting, requirements readable two ways.
 8. **Hand it over and wait:** "Spec written to `<path>`. Review it and tell me what to change before I plan."
 9. **Then `workflow:plan`.** No other skill.

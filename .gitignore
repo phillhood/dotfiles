@@ -38,5 +38,7 @@ herdr/.config/herdr/*.bak*
 *.bak
 
 # ---- Session artifacts: per-session planning/implementation docs, never track ----
-# superpowers specs/plans/handoffs are working notes for a session, not repo content
-docs/superpowers/
+# No trailing slash: in a git worktree both are symlinks back to the main checkout,
+# and a directory-only rule leaves the symlink showing as untracked.
+.dev
+.docs
