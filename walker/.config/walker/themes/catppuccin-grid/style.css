@@ -1,7 +1,7 @@
 
 * {
   all: unset;
-  font-family: "MesoLGS Nerd Font", monospace;
+  font-family: "MesloLGS Nerd Font", monospace;
   font-size: 14px;
   color: #cdd6f4; /* Catppuccin Text for unselected text */
   /* Keeps the premium, buttery smooth animation */

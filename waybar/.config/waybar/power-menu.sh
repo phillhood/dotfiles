@@ -1,22 +1,31 @@
 #!/usr/bin/env bash
-confirm() {
-  local answer
-  answer=$(printf '%s\n' "  No" "  Yes" | walker --dmenu -t power -n -H -p "$1?")
-  [[ "$answer" == *Yes ]]
+menu() {
+  local prompt=$1
+  shift
+  printf '%s\n' "$@" | walker --dmenu -t power -n -H -p "$prompt"
 }
 
-chosen=$(printf '%s\n' \
+run() {
+  "$@" || notify-send -u critical "Power menu" "$1 failed"
+}
+
+confirm() {
+  [[ "$(menu "$1?" "  No" "  Yes")" == *Yes ]]
+}
+
+chosen=$(menu "Power" \
   "  Lock" \
   "  Logout" \
   "  Suspend" \
   "  Reboot" \
-  "  Shutdown" \
-  | walker --dmenu -t power -n -H -p "Power")
+  "  Shutdown")
 
 case "$chosen" in
-  *Lock)     hyprlock ;;
-  *Logout)   hyprctl dispatch exit ;;
-  *Suspend)  systemctl suspend ;;
-  *Reboot)   confirm "Reboot" && systemctl reboot ;;
-  *Shutdown) confirm "Shutdown" && systemctl poweroff ;;
+  *Lock)     run hyprlock ;;
+  *Logout)   run hyprctl dispatch 'hl.dsp.exit()' ;;
+  *Suspend)  run systemctl suspend ;;
+  *Reboot)   confirm "Reboot" && run systemctl reboot ;;
+  *Shutdown) confirm "Shutdown" && run systemctl poweroff ;;
+  "") ;;
+  *) notify-send -u critical "Power menu" "unrecognised selection: $chosen" ;;
 esac

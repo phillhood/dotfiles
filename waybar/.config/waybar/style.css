@@ -416,15 +416,19 @@ tooltip label {
 /* Container: launcher (Arch button) */
 #launcher-box {
   margin: 0px 2px 2px 0px;
-  padding: 2px 0px;
+  padding: 0px;
 }
 
 #custom-arch {
   color: @blue;
-  font-size: 16px;
-  min-width: 15px;
-  padding: 0px 8px 0px 8px;
+  min-width: 18px;
+  padding: 0px 8px 0px 6px;
   border-radius: 3px;
+}
+
+#custom-arch,
+#custom-arch label {
+  font-size: 22px;
 }
 
 #custom-arch:hover {
