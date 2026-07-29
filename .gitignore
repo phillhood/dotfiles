@@ -25,6 +25,9 @@ claude/.claude/plugins/
 hypr/.config/hypr/plugins/
 # waybar keeps old config snapshots
 waybar/.config/waybar/backup/
+# herdr-watchr's installer writes <file>.herdr-watchr-backup-<epoch> beside whatever it
+# splices, and the waybar configs are symlinks into this repo, so they land here
+waybar/.config/waybar/*.herdr-watchr-backup-*
 # herdr rewrites sockets/logs/session state beside its config; only config.toml is tracked
 herdr/.config/herdr/*.log
 herdr/.config/herdr/*.sock
