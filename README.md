@@ -52,8 +52,8 @@ Repo-only (not stowed): `tools/` — terminal colour-scheme tooling in `tools/te
 Prerequisite: `stow` installed (`sudo pacman -S stow`).
 
 ```sh
-git clone https://github.com/phillhood/.dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
+git clone https://github.com/phillhood/dotfiles.git ~/Dev/phillhood/dotfiles
+cd ~/Dev/phillhood/dotfiles
 make install          # symlink every package into $HOME
 ```
 
