@@ -8,6 +8,18 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 export PATH="$HOME/.local/share/fnm:$PATH"
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
+# ---- OS-specific configs + utils ----
+# Sourced before the tool evals below: on macOS this is where brew puts
+# starship/fnm/fzf/etc on PATH, so moving it later breaks every one of them.
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  os_utils="$HOME/.config/utils/distro/$ID"
+else
+  os_utils="$HOME/.config/utils/distro/$(uname -s | tr '[:upper:]' '[:lower:]')"
+fi
+[ -r "$os_utils" ] && source "$os_utils"
+unset os_utils
+
 # ---- zinit (plugin manager) ----
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 [ ! -d "$ZINIT_HOME" ] && mkdir -p "$(dirname "$ZINIT_HOME")"
@@ -51,15 +63,15 @@ bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 
 # ---- Prompt ----
-eval "$(starship init zsh)"
+command -v starship >/dev/null && eval "$(starship init zsh)"
 
 # ---- Shell integrations ----
-eval "$(fnm env --use-on-cd --shell zsh)"
-eval "$(uv generate-shell-completion zsh)"
-eval "$(fzf --zsh)"
-eval "$(atuin init zsh --disable-up-arrow)"
-eval "$(direnv hook zsh)"
-eval "$(zoxide init zsh --cmd cd)"
+command -v fnm >/dev/null && eval "$(fnm env --use-on-cd --shell zsh)"
+command -v uv >/dev/null && eval "$(uv generate-shell-completion zsh)"
+command -v fzf >/dev/null && eval "$(fzf --zsh)"
+command -v atuin >/dev/null && eval "$(atuin init zsh --disable-up-arrow)"
+command -v direnv >/dev/null && eval "$(direnv hook zsh)"
+command -v zoxide >/dev/null && eval "$(zoxide init zsh --cmd cd)"
 
 # ---- Aliases ----
 alias c='clear'
@@ -98,15 +110,8 @@ for file in $HOME/.config/utils/*(-.N); do
   [ -r "$file" ] && source "$file"
 done
 
-# ---- Distro-specific configs + utils ----
-if [ -f /etc/os-release ]; then
-  . /etc/os-release
-  distro_file="$HOME/.config/utils/distro/$ID"
-  [ -r "$distro_file" ] && source "$distro_file"
-fi
-
 # ---- Installer wasteland ----
 
 # >>> Codex installer >>>
-export PATH="/home/phill/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 # <<< Codex installer <<<

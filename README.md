@@ -1,6 +1,8 @@
 # dotfiles
 
-Personal dotfiles for Arch Linux (Hyprland/Wayland), managed with [GNU Stow](https://www.gnu.org/software/stow/).
+Personal dotfiles for Arch Linux (Hyprland/Wayland) and macOS, managed with
+[GNU Stow](https://www.gnu.org/software/stow/). The desktop packages are Linux-only; the shell and
+CLI packages are shared — see [Per-OS packages](#per-os-packages).
 
 Each top-level directory is a **stow package** that mirrors the layout under `$HOME`.
 `stow <package>` symlinks its contents into place. Editing a file here changes the live
@@ -49,13 +51,27 @@ Repo-only (not stowed): `tools/` — terminal colour-scheme tooling in `tools/te
 
 ## Usage
 
-Prerequisite: `stow` installed (`sudo pacman -S stow`).
+Prerequisite: `stow` installed (`sudo pacman -S stow`, or `brew install stow` on macOS).
 
 ```sh
 git clone https://github.com/phillhood/dotfiles.git ~/Dev/phillhood/dotfiles
 cd ~/Dev/phillhood/dotfiles
-make install          # symlink every package into $HOME
+make install          # symlink every package for this OS into $HOME
 ```
+
+Clone to that exact path on every host — `HERDR_CONFIG_PATH` in `zsh/.zshrc` hardcodes it.
+
+### Per-OS packages
+
+`Makefile` splits packages into `COMMON_PACKAGES` and `LINUX_PACKAGES`, selected on `uname -s`.
+`hypr`, `waybar` and `walker` are Linux-only and are skipped on macOS; everything else is stowed
+on both. Adding a top-level package means adding it to whichever of the two lists it belongs in.
+
+macOS also gets `zsh/.config/utils/distro/darwin` instead of `distro/arch`. That dispatch keys off
+`/etc/os-release`'s `$ID` where the file exists and falls back to lowercased `uname -s`, and it runs
+before the `starship`/`fnm`/`fzf`/`atuin` init evals so Homebrew's `shellenv` is on `PATH` in time.
+Each of those evals is guarded by `command -v`, so a host missing one of the tools still gets a
+working shell rather than a wall of errors.
 
 Common operations:
 
@@ -70,7 +86,7 @@ stow --no-folding -n zsh      # dry-run (show what would happen)
 ```
 
 > [!IMPORTANT]
-> Always pass `--no-folding` when calling `stow` directly (`make` already does — see `Makefile:2-4`).
+> Always pass `--no-folding` when calling `stow` directly (`make` already does — see the `STOW` variable).
 > Without it, stowing `ssh/` or `claude/` onto a host lacking `~/.ssh`/`~/.claude` points that whole
 > directory at this public repo, so a later-written key lands inside it.
 
