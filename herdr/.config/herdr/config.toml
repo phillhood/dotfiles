@@ -14,6 +14,10 @@ split_vertical = "shift+alt+d"
 split_horizontal = "shift+alt+s"
 close_pane = "prefix+x"
 cycle_pane_next = ["prefix+tab", "shift+alt+e"]
+previous_workspace = "shift+alt+k"
+next_workspace = "shift+alt+j"
+previous_agent = "shift+alt+q"
+next_agent = "shift+alt+a"
 
 # shift+alt+w closes the pane via a confirmation popup instead of the raw action
 [[keys.command]]
