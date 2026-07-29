@@ -1,0 +1,6 @@
+# Ctrl identity (overrides default)
+[user]
+	email = 307646357+phill-goctrl@users.noreply.github.com
+	name = Phill Hood
+[core]
+	sshCommand = ssh -i ~/.ssh/id_ctrl -o IdentitiesOnly=yes

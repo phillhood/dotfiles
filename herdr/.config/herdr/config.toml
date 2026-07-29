@@ -8,6 +8,7 @@ auto_switch = false
 surface_dim = "#3a3d52"
 
 [keys]
+prefix = "ctrl+s"
 toggle_sidebar = "ctrl+backtick"
 split_vertical = "shift+alt+d"
 split_horizontal = "shift+alt+s"

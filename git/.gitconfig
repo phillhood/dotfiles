@@ -17,6 +17,10 @@
 	email = phill@phillhood.ca
 	name = Phill Hood
 
-# Hobby identity 
+# Hobby identity
 [includeIf "gitdir:~/Dev/shychedelic/"]
 	path = ~/.gitconfig-shy
+
+# Ctrl identity (goctrl org — pushes as phill-goctrl via ~/.ssh/id_ctrl)
+[includeIf "gitdir:~/Dev/ctrl/"]
+	path = ~/.gitconfig-ctrl

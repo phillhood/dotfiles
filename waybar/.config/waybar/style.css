@@ -64,8 +64,7 @@ window#waybar {
 #system-box,
 #tray-box,
 #clock-box,
-#power-box,
-#herdr-agents,
+#herdr-watchr,
 #custom-cava {
   border-radius: 4px;
   /* border: 1.5px solid @mauve; */
@@ -105,7 +104,7 @@ window#waybar.empty #mpris {
     background-color: transparent;
 }
 
-/* Container: system (cpu / memory / network / bluetooth / audio) */
+/* Container: system (cpu / memory / network / audio) */
 
 #system-box {
   margin: 0px 4px 2px 2px;
@@ -159,19 +158,18 @@ window#waybar.empty #mpris {
   margin-right: -3px;
 }
 
-/* Containers: tray, clock, power */
+/* Containers: tray, clock */
 
 #tray-box,
-#clock-box,
-#power-box {
+#clock-box {
   margin: 0px 4px 2px 2px;
   padding: 2px 0px;
 }
 
-/* Container: herdr agents (one card; one module per status, hidden when empty).
+/* Container: herdr-watchr (one card; one module per status, hidden when empty).
    Padding lives on the child modules (not the group) so the whole card
    collapses to nothing when every status is empty. */
-#herdr-agents {
+#herdr-watchr {
   margin: 0px 4px 2px 2px;
   padding: 0px;
   /* More opaque than the other cards: it floats over the busy center of the
@@ -179,9 +177,9 @@ window#waybar.empty #mpris {
   background-color: alpha(@base, 0.95);
 }
 
-#herdr-agents label,
-#herdr-agents > widget > label,
-#herdr-agents > widget {
+#herdr-watchr label,
+#herdr-watchr > widget > label,
+#herdr-watchr > widget {
   padding: 2px 7px;
   margin: 0px;
   color: @fg;
@@ -190,9 +188,7 @@ window#waybar.empty #mpris {
 }
 
 #tray-box label,
-#tray-box > widget,
-#power-box label,
-#power-box > widget {
+#tray-box > widget {
   padding: 0px 9px;
   margin: 0px 0px;
   color: @fg;
@@ -269,7 +265,6 @@ window#waybar.empty #mpris {
 #mpris,
 #cpu,
 #network,
-#bluetooth,
 #pulseaudio {
   min-width: 15px;
   color: @fg;
@@ -353,7 +348,7 @@ tooltip label {
 }
 
 #custom-media-prev {
-  border-left: 1.5px solid @grey;
+  border-left: 0.5px solid @grey;
 }
 
 #custom-media-prev:hover,

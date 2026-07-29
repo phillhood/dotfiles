@@ -11,6 +11,7 @@
 - `.docs/` and `.dev/` are local-only and must stay out of git. Both are already in `~/.gitignore_global`; also add them to the repo's own `.gitignore` so the rule survives a clone, and to `.dockerignore` where one exists.
 - **Ignore them as `.docs` and `.dev`, without a trailing slash.** In a git worktree both trees are symlinks back to the main checkout (a worktree checks out tracked files only, so the real directories aren't there). A trailing slash matches directories only, and a symlink-to-a-directory isn't one — `.dev/` leaves the symlink showing as untracked in every worktree.
 - `.docs/` is gitignored, so nothing in it survives a clone. Treat it as load-bearing local state and keep it in a backup rotation.
+- **A repo that tracks `.docs` has overridden this on purpose.** A `!.docs` negation in the repo's own `.gitignore` is a deliberate call — usually so the docs are reachable from another machine — not an oversight. Leave it, keep writing there, and commit changes to it like any other tracked file; the two rules above stop applying to that repo, since it survives a clone and git is its backup. This changes nothing by default: `.docs` stays ignored everywhere the choice has not been made explicitly, and `.dev` stays ignored regardless.
 - `README.md` stays at the repo root.
 
 # Recommendations
