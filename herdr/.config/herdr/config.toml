@@ -18,7 +18,11 @@ previous_workspace = "shift+alt+k"
 next_workspace = "shift+alt+j"
 previous_agent = "shift+alt+q"
 next_agent = "shift+alt+a"
-switch_workspace = "shift+alt+1..9"
+switch_workspace = "prefix+shift+1..9"
+switch_tab = ["prefix+1..9", "shift+alt+1..9"]
+next_tab = ["prefix+n", "shift+alt+r"]
+previous_tab = ["prefix+p", "shift+alt+f"]
+new_tab = ["prefix+c", "shift+alt+t"]
 
 # shift+alt+w closes the pane via a confirmation popup instead of the raw action
 [[keys.command]]
@@ -34,6 +38,7 @@ agent_panel_sort = "spaces"
 show_agent_labels_on_pane_borders = true
 sidebar_width = 20
 accent = "#c6a0f6"
+prompt_new_tab_name = false
 
 [ui.sidebar.agents]
 row_gap = 1
