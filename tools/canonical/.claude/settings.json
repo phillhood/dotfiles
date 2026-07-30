@@ -19,7 +19,7 @@
   "theme": "dark",
   "statusLine": {
     "type": "command",
-    "command": "/home/phill/.claude/ccline/ccline",
+    "command": "~/.claude/statusline.sh",
     "padding": 0
   },
   "attribution": {

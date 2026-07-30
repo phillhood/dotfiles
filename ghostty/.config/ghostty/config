@@ -1,12 +1,10 @@
 # Styling
 theme = Catppuccin Mocha
 font-family = MesloLGS Nerd Font
-font-size = 10
 background-opacity = 1
 background-blur-radius = 20
 cursor-style = bar
 cursor-style-blink = true
-window-decoration = false
 minimum-contrast = 3
 
 # Options
@@ -14,3 +12,6 @@ shell-integration-features = ssh-terminfo
 
 # Keybinds
 keybind = ctrl+w=close_surface
+
+# Per-OS overlay (ghostty-darwin / ghostty-linux stow package)
+config-file = ?os.conf

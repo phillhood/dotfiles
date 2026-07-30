@@ -16,7 +16,7 @@ config immediately — the deployed files are symlinks back into this repo.
 | `starship`  | `~/.config/starship.toml`                                       |
 | `git`       | `~/.gitconfig`, `~/.gitconfig-shy`, `~/.gitignore_global`       |
 | `tmux`      | `~/.tmux.conf`                                                  |
-| `ssh`       | `~/.ssh/config`                                                 |
+| `ssh-linux` | `~/.ssh/config.d/homelab.conf`                                  |
 | `claude`    | `~/.claude/CLAUDE.md`, `~/.claude/hooks/uv-python.sh`           |
 | `pi`        | `~/.pi/agent/extensions/{status-line,context-command,title}.ts` |
 | `bat`       | `~/.config/bat/config`                                          |
@@ -26,7 +26,8 @@ config immediately — the deployed files are symlinks back into this repo.
 | `hypr`      | `~/.config/hypr/{hyprland.lua,hyprland-gui.lua,themes,scripts}` |
 | `waybar`    | `~/.config/waybar/{config.jsonc,style.css,*.sh}`                |
 | `walker`    | `~/.config/walker/*`                                            |
-| `ghostty`   | `~/.config/ghostty/*`                                           |
+| `ghostty`   | `~/.config/ghostty/config`                                      |
+| `ghostty-darwin` / `ghostty-linux` | `~/.config/ghostty/os.conf` (per-OS overlay)    |
 | `btop`      | `~/.config/btop/*`                                              |
 | `cava`      | `~/.config/cava/*`                                              |
 | `fastfetch` | `~/.config/fastfetch/*`                                         |
@@ -46,15 +47,33 @@ points herdr straight at the repo copy. The stowed symlink stays as a fallback f
 without that variable; both routes resolve to the same file, so they cannot diverge.
 
 Repo-only (not stowed): `tools/` — terminal colour-scheme tooling in `tools/terminals/`, plus
-`tools/canonical/` (reference configs a tool rewrites live — e.g. `.claude/settings.json` — applied by
-`bootstrap`, not stow).
+`tools/canonical/` (reference configs a tool rewrites live — `.claude/settings.json` and
+`.ssh/config` — applied by `bootstrap`, not stow).
+
+### ~/.ssh/config is deliberately not stowed
+
+`~/.ssh/config` stays a real per-machine file. Colima and the AWS Toolkit for VSCode both write host
+blocks into it, and if it were a stow symlink those writes would land in this repo. The tracked host
+definitions live in `ssh-linux/.ssh/config.d/homelab.conf` instead, pulled in by
+
+```
+Include ~/.ssh/config.d/*.conf
+```
+
+which must stay the **first** line: ssh takes the first value it finds for each keyword, so anything
+above the `Include` silently wins over the tracked fragments. A glob that matches nothing is not an
+error, so the same skeleton works on a machine with no fragments stowed. `tools/canonical/.ssh/config`
+holds that skeleton for fresh machines.
+
+The homelab hosts are Linux-only because they pin `~/.ssh/id_ed25519_homelab` with
+`IdentitiesOnly yes`, and that key is not on the mac.
 
 ## Usage
 
 Prerequisite: `stow` installed (`sudo pacman -S stow`, or `brew install stow` on macOS).
 
 ```sh
-git clone https://github.com/phillhood/dotfiles.git ~/Dev/phillhood/dotfiles
+git clone git@git.lab.shychedelic.com:phillhood/dotfiles.git ~/Dev/phillhood/dotfiles
 cd ~/Dev/phillhood/dotfiles
 make install          # symlink every package for this OS into $HOME
 ```
@@ -63,9 +82,21 @@ Clone to that exact path on every host — `HERDR_CONFIG_PATH` in `zsh/.zshrc` h
 
 ### Per-OS packages
 
-`Makefile` splits packages into `COMMON_PACKAGES` and `LINUX_PACKAGES`, selected on `uname -s`.
-`hypr`, `waybar` and `walker` are Linux-only and are skipped on macOS; everything else is stowed
-on both. Adding a top-level package means adding it to whichever of the two lists it belongs in.
+`Makefile` splits packages into `COMMON_PACKAGES`, `LINUX_PACKAGES` and `DARWIN_PACKAGES`, selected on
+`uname -s`. `hypr`, `waybar`, `walker`, `ghostty-linux` and `ssh-linux` are Linux-only;
+`ghostty-darwin` is macOS-only; everything else is stowed on both. Adding a top-level package means adding it to whichever
+of the three lists it belongs in.
+
+Where a single config file needs a few different lines per OS, keep the shared file in the common
+package and put the divergent keys in a per-OS overlay package, using the tool's own optional-include
+so only the overlay for the running OS is ever stowed. `ghostty` is the worked example: the shared
+`config` ends with `config-file = ?os.conf`, and `ghostty-darwin`/`ghostty-linux` each supply their own
+`os.conf`. The `?` makes a missing overlay a no-op rather than an error.
+
+Splitting into two packages rather than shipping both overlays and letting load order settle it is
+deliberate: Ghostty parses the full key schema on every platform, so a macOS-only key like
+`macos-option-as-alt` is accepted (and inert) on Linux. With both files stowed, a key added to one
+overlay and forgotten in the other would silently apply on both OSes.
 
 macOS also gets `zsh/.config/utils/distro/darwin` instead of `distro/arch`. That dispatch keys off
 `/etc/os-release`'s `$ID` where the file exists and falls back to lowercased `uname -s`, and it runs
@@ -87,8 +118,8 @@ stow --no-folding -n zsh      # dry-run (show what would happen)
 
 > [!IMPORTANT]
 > Always pass `--no-folding` when calling `stow` directly (`make` already does — see the `STOW` variable).
-> Without it, stowing `ssh/` or `claude/` onto a host lacking `~/.ssh`/`~/.claude` points that whole
-> directory at this public repo, so a later-written key lands inside it.
+> Without it, stowing `ssh-linux/` or `claude/` onto a host lacking `~/.ssh`/`~/.claude` points that
+> whole directory at this repo, so a later-written key lands inside it.
 
 `make install` only creates symlinks — it does **not** install software.
 
