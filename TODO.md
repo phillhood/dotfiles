@@ -15,7 +15,7 @@ Open follow-ups for the stow-based dotfiles.
 - [ ] Decide whether to track the last two: `~/.config/nwg-look/config` (282 B, GTK theme) and
       `~/.config/wireplumber/wireplumber.conf.d/` (drop-ins). Both still real dirs.
 - [ ] Machine-specific lines ship as-is in `hypr/.config/hypr/hyprland.lua`: monitors hardcoded to
-      `DP-3`/`DP-2` (lines 10-11) and an Nvidia env block (lines 24-26). Stowing on another machine
+      `DP-1`/`DP-2` (lines 10-11) and an Nvidia env block (lines 24-26). Stowing on another machine
       misconfigures it; a generic fallback sits commented out at line 15.
 
 ## SSH

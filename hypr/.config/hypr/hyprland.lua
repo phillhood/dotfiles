@@ -7,7 +7,7 @@ local colors = require("themes.catppuccin-mocha")
 ---- MONITORS   ----
 --------------------
 
-local main_mon = "DP-3" -- main monitor (landscape)
+local main_mon = "DP-1" -- main monitor (landscape)
 local side_mon = "DP-2" -- side monitor (portrait)
 
 hl.monitor({ output = main_mon, mode = "preferred", position = "0x0", scale = 1 })
@@ -46,7 +46,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("bash -c 'pkill -x waybar 2>/dev/null; d=1; while true; do t=$SECONDS; waybar; if [ $((SECONDS-t)) -ge 10 ]; then d=1; else d=$(( d<8 ? d*2 : 8 )); fi; sleep $d; done'")
 	hl.exec_cmd("swaync")
 	hl.exec_cmd("awww-daemon")
-	hl.exec_cmd("bash -c 'until awww query >/dev/null 2>&1; do sleep 0.2; done; L=~/Pictures/Wallpapers/cyberpunk_landscape.jpg; P=~/Pictures/Wallpapers/cyberpunk_portrait.jpg; awww img -o DP-3 $L; awww img -o DP-2 $P; while sleep 2; do awww query 2>/dev/null | grep DP-3 | grep -q color: && awww img -o DP-3 $L; awww query 2>/dev/null | grep DP-2 | grep -q color: && awww img -o DP-2 $P; done'")
+	hl.exec_cmd("bash -c 'M=" .. main_mon .. "; S=" .. side_mon .. "; until awww query >/dev/null 2>&1; do sleep 0.2; done; L=~/Pictures/Wallpapers/cyberpunk_landscape.jpg; P=~/Pictures/Wallpapers/cyberpunk_portrait.jpg; awww img -o $M $L; awww img -o $S $P; while sleep 2; do awww query 2>/dev/null | grep $M | grep -q color: && awww img -o $M $L; awww query 2>/dev/null | grep $S | grep -q color: && awww img -o $S $P; done'")
 	hl.exec_cmd("wl-paste --watch cliphist store")
 	hl.exec_cmd("nm-applet --indicator")
 	-- XEmbed->SNI bridge for Wine/Battle.net tray icons. sleep 2 avoids racing
@@ -305,7 +305,7 @@ local smw = require("plugins.split-monitor-workspaces")
 smw.setup({
     workspace_count = 10,
 	monitor_priority = { main_mon, side_mon },
-	max_workspaces = { ["DP-2"] = 3 },
+	max_workspaces = { [side_mon] = 3 },
 	keep_focused = true,
 	enable_wrapping = true,
 	link_monitors = false,

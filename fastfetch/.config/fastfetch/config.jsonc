@@ -37,24 +37,25 @@
       "keyColor": "31"
     },
     {
-      "type": "host",
-      "key": "      Device  ",
-      "format": "{2}",
-      "keyColor": "33"
-    },
-    {
       "type": "kernel",
       "key": "      Kernel  ",
-      "keyColor": "32"
+      "keyColor": "33"
     },
     {
       "type": "packages",
       "key": "     󰏖 Packages",
+      "keyColor": "32"
+    },
+    {
+      "type": "command",
+      "key": "     󰞷 Terminal",
+      "text": "echo \"${TERM_PROGRAM:-$TERM} ${TERM_PROGRAM_VERSION%%-*}\"",
       "keyColor": "36"
     },
     {
-      "type": "terminal",
-      "key": "     󰞷 Terminal",
+      "type": "command",
+      "key": "     󰓩 Mux     ",
+      "text": "if [ -n \"$HERDR_ENV\" ]; then echo \"herdr (${HERDR_WORKSPACE_ID:-?})\"; elif [ -n \"$ZELLIJ\" ]; then echo zellij; elif [ -n \"$TMUX\" ]; then echo tmux; elif [ -n \"$STY\" ]; then echo screen; else echo none; fi",
       "keyColor": "34"
     },
     {
