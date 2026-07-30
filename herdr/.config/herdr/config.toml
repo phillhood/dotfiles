@@ -18,6 +18,7 @@ previous_workspace = "shift+alt+k"
 next_workspace = "shift+alt+j"
 previous_agent = "shift+alt+q"
 next_agent = "shift+alt+a"
+switch_workspace = "shift+alt+1..9"
 
 # shift+alt+w closes the pane via a confirmation popup instead of the raw action
 [[keys.command]]
