@@ -3,7 +3,7 @@
 # stowing ssh-linux/ or claude/ onto a host lacking ~/.ssh or ~/.claude can't point that
 # dir at this repo and leak a later-written key/credential into it.
 # ~/.ssh/config itself is deliberately not a package — see tools/canonical/.ssh/config.
-COMMON_PACKAGES := zsh starship git tmux ssh claude pi bat htop k9s helm ghostty btop cava fastfetch herdr herdr-watchr
+COMMON_PACKAGES := zsh starship git tmux ssh claude pi bat htop k9s helm ghostty btop cava fastfetch herdr herdr-watchr nvim
 LINUX_PACKAGES := hypr waybar walker ghostty-linux ssh-linux
 DARWIN_PACKAGES := ghostty-darwin
 

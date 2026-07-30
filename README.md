@@ -33,6 +33,7 @@ config immediately — the deployed files are symlinks back into this repo.
 | `cava`      | `~/.config/cava/*`                                              |
 | `fastfetch` | `~/.config/fastfetch/*`                                         |
 | `herdr`     | `~/.config/herdr/config.toml`, `~/.local/bin/herdr-confirm-close-pane` |
+| `nvim`      | `~/.config/nvim/{init.lua,lua,lazy-lock.json,.stylua.toml}`      |
 
 `hypr/.config/hypr/plugins/`, `waybar/.config/waybar/backup/`, herdr's sockets/logs/session state, and
 `*.bak` are gitignored, so they never enter the repo. That's git-level, not stow-level — gitignore
