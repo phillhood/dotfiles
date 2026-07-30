@@ -49,6 +49,17 @@ Open follow-ups for the stow-based dotfiles.
 - [x] Per-OS overlay pattern established on `ghostty`: shared `config` ends with `config-file = ?os.conf`
       and `ghostty-darwin`/`ghostty-linux` each supply an `os.conf`. Only the running OS's overlay is
       stowed, so a key added to one cannot leak to the other.
+- [x] `fastfetch` stays a single shared package — it loads exactly one config file (`-c` twice fails with
+      `only one config file can be loaded`, and the jsonc has no include), so the ghostty overlay pattern
+      would mean duplicating all 122 lines. Made OS-agnostic instead: dropped `logo.source = arch` so
+      `type: auto` picks the running OS logo, swapped the Arch glyph on the OS row for a neutral one, and
+      made the `OS Age` command try GNU `stat -c %W` then BSD `stat -f %B`. It previously printed 20664
+      days on macOS — `stat -c` errored, `birthd` came out empty, and the arithmetic measured the epoch.
+- [x] `logo.color` carries a 6-stop Catppuccin Mocha ramp. Slot count is fixed by the builtin logo and
+      keys past it are ignored: `macos` exposes 6 bands top-to-bottom, every Arch builtin (`arch`,
+      `arch2`, `arch3`, `arch_small`, `arch_old`) exposes only 2. One config file serves both, so slots
+      1-2 colour the whole Arch logo *and* the Apple's top two bands — they stay sky/mauve to keep the
+      Arch look, and 3-6 continue the sweep on the mac only.
 - [ ] Hardcoded Linux paths still ship in packages stowed on both, and are wrong on macOS:
       `k9s/.config/k9s/config.yaml` `screenDumpDir: /home/phill/…` and
       `herdr/.config/herdr/config.toml` `command = /home/phill/.local/bin/herdr-confirm-close-pane`.

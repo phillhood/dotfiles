@@ -3,14 +3,17 @@
   "$schema": "https://raw.githubusercontent.com/fastfetch-cli/fastfetch/dev/doc/json_schema.json",
   "logo": {
     "type": "auto",
-    "source": "arch",
     "padding": {
       "top": 0,
       "right": 3
     },
     "color": {
-      "1": "#00D1FF",
-      "2": "#BD93F9"
+      "1": "#89dceb",
+      "2": "#cba6f7",
+      "3": "#f5c2e7",
+      "4": "#f38ba8",
+      "5": "#fab387",
+      "6": "#f9e2af"
     }
   },
   "display": {
@@ -30,7 +33,7 @@
     },
     {
       "type": "os",
-      "key": "     󰣇 OS      ",
+      "key": "     󰍹 OS      ",
       "keyColor": "31"
     },
     {
@@ -99,7 +102,7 @@
     {
       "type": "command",
       "key": "      OS Age  ",
-      "text": "birthd=$(stat -c %W /); echo $(( ( $(date +%s) - birthd ) / 86400 )) days",
+      "text": "birth=$(stat -c %W / 2>/dev/null || stat -f %B / 2>/dev/null); [ ${birth:-0} -gt 0 ] && echo $(( ( $(date +%s) - birth ) / 86400 )) days || echo unknown",
       "keyColor": "34"
     },
     {
