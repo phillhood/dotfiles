@@ -103,12 +103,30 @@ fmt_tokens() {
   fi
 }
 
+# ISO 8601 -> unix epoch. GNU date parses it from -d; BSD date has no -d at all and
+# needs an exact -f format, so the offset is normalised and fed to -j. Without the
+# fallback every ETA silently vanishes on macOS.
+iso_to_epoch() {
+  local s=$1 out base tz
+  out=$(date -d "$s" +%s 2>/dev/null) && [[ -n $out ]] && { printf '%s' "$out"; return 0; }
+  [[ $s =~ ^([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2})(\.[0-9]+)?(Z|[+-][0-9]{2}:?[0-9]{2})?$ ]] || return 1
+  base=${BASH_REMATCH[1]} tz=${BASH_REMATCH[3]}
+  if [[ -z $tz ]]; then
+    out=$(date -j -f '%Y-%m-%dT%H:%M:%S' "$base" +%s 2>/dev/null)
+  else
+    [[ $tz == Z ]] && tz='+0000' || tz=${tz/:/}
+    out=$(date -j -f '%Y-%m-%dT%H:%M:%S%z' "$base$tz" +%s 2>/dev/null)
+  fi
+  [[ -n $out ]] || return 1
+  printf '%s' "$out"
+}
+
 # unix epoch or ISO 8601 -> 4h20m | 5d2h ; a reset already past clamps to 0h0m
 fmt_eta() {
   local t=$1 now=${STATUSLINE_NOW:-$EPOCHSECONDS} d
   [[ $t == - ]] && return 1
   if [[ ! $t =~ ^[0-9]+$ ]]; then
-    t=$(date -d "$t" +%s 2>/dev/null) || return 1
+    t=$(iso_to_epoch "$t") || return 1
     [[ -n $t ]] || return 1
   fi
   d=$(( t - now )); (( d < 0 )) && d=0

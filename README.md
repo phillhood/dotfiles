@@ -62,8 +62,11 @@ Include ~/.ssh/config.d/*.conf
 
 which must stay the **first** line: ssh takes the first value it finds for each keyword, so anything
 above the `Include` silently wins over the tracked fragments. A glob that matches nothing is not an
-error, so the same skeleton works on a machine with no fragments stowed. `tools/canonical/.ssh/config`
-holds that skeleton for fresh machines.
+error, so the same skeleton works on a machine with no fragments stowed.
+
+`make ssh-config` (also run by `make install`) installs that skeleton from
+`tools/canonical/.ssh/config` at mode 600 when `~/.ssh/config` is absent or a dangling symlink, leaves
+an existing real file alone, and warns if the `Include` line is missing.
 
 The homelab hosts are Linux-only because they pin `~/.ssh/id_ed25519_homelab` with
 `IdentitiesOnly yes`, and that key is not on the mac.

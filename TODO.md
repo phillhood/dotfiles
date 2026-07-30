@@ -23,11 +23,12 @@ Open follow-ups for the stow-based dotfiles.
       both write host blocks into it, so a stow symlink would send those writes into the repo. Tracked
       hosts moved to `ssh-linux/.ssh/config.d/homelab.conf`, pulled in by a leading
       `Include ~/.ssh/config.d/*.conf`; skeleton in `tools/canonical/.ssh/config`.
+- [x] `make ssh-config` installs the skeleton at mode 600 when `~/.ssh/config` is absent or a dangling
+      symlink, leaves a real file untouched, and warns when the `Include` line is missing. Wired into
+      `make install`, so bootstrap needs no extra step.
 - [ ] **Arch, one-time:** `~/.ssh/config` there is still a symlink to the deleted `ssh/.ssh/config`, so
-      it dangles after this is pulled. Replace it with a real file from `tools/canonical/.ssh/config`
-      before `make stow`, or every ssh host on that box stops resolving.
-- [ ] Bootstrap: copy `tools/canonical/.ssh/config` to `~/.ssh/config` (mode 600) when absent, never
-      overwriting an existing one. Keep the `Include` first — ssh is first-match-wins.
+      it dangles once this is pulled. Run `make ssh-config` (or `make install`) on that box — it detects
+      the dangling link and swaps in the skeleton. Until then every ssh host there stops resolving.
 - [ ] `~/.gitconfig` `includeIf` blocks point at `~/.ssh/id_shy` and `~/.ssh/id_ctrl`; neither key is on
       the mac, so a commit under those identities fails there. Decide whether to install them or scope
       the includes per-OS.
@@ -41,3 +42,17 @@ Open follow-ups for the stow-based dotfiles.
       at runtime. Keep the canonical copy free of `//` comments so `jq` can parse it. The `statusLine`
       now points at `~/.claude/statusline.sh`, which the `claude` package stows — nothing extra to
       install, but it needs `bash` 5+ and `jq` on `PATH`.
+- [x] `statusline.sh` parses an ISO 8601 `resets_at` on both platforms — GNU `date -d` first, then a
+      BSD `date -j -f` fallback. Previously every usage ETA silently vanished on macOS.
+
+## Cross-platform (macOS ⇄ Arch)
+- [x] Per-OS overlay pattern established on `ghostty`: shared `config` ends with `config-file = ?os.conf`
+      and `ghostty-darwin`/`ghostty-linux` each supply an `os.conf`. Only the running OS's overlay is
+      stowed, so a key added to one cannot leak to the other.
+- [ ] Hardcoded Linux paths still ship in packages stowed on both, and are wrong on macOS:
+      `k9s/.config/k9s/config.yaml` `screenDumpDir: /home/phill/…` and
+      `herdr/.config/herdr/config.toml` `command = /home/phill/.local/bin/herdr-confirm-close-pane`.
+      Neither tool is known to support an include or `$HOME` expansion — check before choosing between
+      a per-OS package and an env-var indirection.
+- [ ] `herdr-watchr` sits in `COMMON_PACKAGES` but its `waybar` block shells out to `hyprctl`, which
+      only exists under Hyprland. Decide whether the package belongs in `LINUX_PACKAGES`.

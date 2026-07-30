@@ -15,13 +15,30 @@ endif
 
 STOW := stow --no-folding --verbose --target=$(HOME)
 
-.PHONY: help install stow unstow restow adopt
+.PHONY: help install stow unstow restow adopt ssh-config
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
-		awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-8s\033[0m %s\n", $$1, $$2}'
+		awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-11s\033[0m %s\n", $$1, $$2}'
 
-install: stow ## Symlink all packages into $HOME (does NOT install software)
+install: ssh-config stow ## Symlink all packages into $HOME (does NOT install software)
+
+ssh-config: ## Install ~/.ssh/config from tools/canonical (never overwrites a real file)
+	@mkdir -p $(HOME)/.ssh && chmod 700 $(HOME)/.ssh
+	@if [ -L $(HOME)/.ssh/config ] && [ ! -e $(HOME)/.ssh/config ]; then \
+		rm -f $(HOME)/.ssh/config; \
+		install -m 600 tools/canonical/.ssh/config $(HOME)/.ssh/config; \
+		echo "ssh-config: replaced dangling symlink with the skeleton"; \
+	elif [ -L $(HOME)/.ssh/config ]; then \
+		echo "ssh-config: ~/.ssh/config is still a symlink into the repo; remove it and re-run"; \
+	elif [ -e $(HOME)/.ssh/config ]; then \
+		echo "ssh-config: ~/.ssh/config already a real file, left untouched"; \
+	else \
+		install -m 600 tools/canonical/.ssh/config $(HOME)/.ssh/config; \
+		echo "ssh-config: installed the skeleton"; \
+	fi
+	@grep -qF 'Include ~/.ssh/config.d/*.conf' $(HOME)/.ssh/config 2>/dev/null || \
+		echo "ssh-config: WARNING no 'Include ~/.ssh/config.d/*.conf' line, tracked hosts will not load"
 
 stow: ## Stow (symlink) all packages
 	$(STOW) --restow $(PACKAGES)
