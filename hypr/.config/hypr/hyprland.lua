@@ -155,6 +155,17 @@ hl.window_rule({
 	fullscreen = true,
 })
 
+-- Battle.net shares WoW's Wine class (steam_app_default) -- only the title tells
+-- them apart, so every rule and lookup here must match on title as well.
+hl.window_rule({
+	name = "battlenet-workspace",
+	match = {
+		class = "steam_app_default",
+		title = "^Battle\\.net$",
+	},
+	workspace = "name:WoW",
+})
+
 -- Snip editor (Super+Shift+S) floats instead of tiling.
 hl.window_rule({
 	name = "swappy-float",
@@ -261,6 +272,27 @@ hl.bind(mod .. " + F", function()
 		return
 	end
 	hl.dispatch(hl.dsp.window.fullscreen())
+end)
+
+-- Jump to the game: WoW if it's running, else the Battle.net launcher, else start it.
+hl.bind(mod .. " + grave", function()
+	local battlenet
+	for _, w in ipairs(hl.get_windows()) do
+		if w.class == "steam_app_default" then
+			if w.title == "World of Warcraft" then
+				hl.dispatch(hl.dsp.focus({ window = w }))
+				return
+			elseif w.title == "Battle.net" then
+				battlenet = w
+			end
+		end
+	end
+	if battlenet then
+		hl.dispatch(hl.dsp.focus({ window = battlenet }))
+		return
+	end
+	hl.dispatch(hl.dsp.focus({ workspace = "name:WoW" }))
+	hl.dispatch(hl.dsp.exec_cmd("lutris lutris:rungame/battlenet"))
 end)
 
 -- Media keys ----------------------------------------------------------------
