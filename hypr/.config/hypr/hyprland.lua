@@ -155,17 +155,6 @@ hl.window_rule({
 	fullscreen = true,
 })
 
--- Battle.net shares WoW's Wine class (steam_app_default) -- only the title tells
--- them apart, so every rule and lookup here must match on title as well.
-hl.window_rule({
-	name = "battlenet-workspace",
-	match = {
-		class = "steam_app_default",
-		title = "^Battle\\.net$",
-	},
-	workspace = "name:WoW",
-})
-
 -- Snip editor (Super+Shift+S) floats instead of tiling.
 hl.window_rule({
 	name = "swappy-float",
