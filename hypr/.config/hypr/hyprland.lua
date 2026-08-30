@@ -224,6 +224,35 @@ hl.layer_rule({
 	ignore_alpha = 0.4,
 })
 
+hl.layer_rule({
+	name = "swaync-blur",
+	match = "swaync-control-center",
+	blur = true,
+	ignore_alpha = 0.4,
+})
+
+hl.layer_rule({
+	name = "swaync-popup-blur",
+	match = "swaync-notification-window",
+	blur = true,
+	ignore_alpha = 0.4,
+})
+
+--------------------------
+----  NOTIFICATIONS  ----
+--------------------------
+
+local function sync_noti_monitor()
+	local mon = hl.get_monitor(main_mon)
+	local ws = mon and mon.active_workspace
+	local target = (ws and ws.has_fullscreen) and side_mon or main_mon
+	hl.exec_cmd("swaync-client --change-noti-monitor " .. target)
+end
+
+hl.on("window.fullscreen", sync_noti_monitor)
+hl.on("window.close", sync_noti_monitor)
+hl.on("workspace.active", sync_noti_monitor)
+
 --------------------
 ----  PROGRAMS  ----
 --------------------

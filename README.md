@@ -26,6 +26,7 @@ config immediately — the deployed files are symlinks back into this repo.
 | `helm`      | `~/.config/helm/repositories.yaml`                              |
 | `hypr`      | `~/.config/hypr/{hyprland.lua,hyprland-gui.lua,themes,scripts}` |
 | `waybar`    | `~/.config/waybar/{bars.jsonc,config.jsonc,style.css,*.sh}`     |
+| `swaync`    | `~/.config/swaync/{config.json,style.css,focus-app.sh}`         |
 | `walker`    | `~/.config/walker/*`                                            |
 | `ghostty`   | `~/.config/ghostty/config`                                      |
 | `ghostty-darwin` / `ghostty-linux` | `~/.config/ghostty/os.conf` (per-OS overlay)    |
@@ -112,7 +113,7 @@ works. Port 2222 is LAN-only and not proxied to the WAN, so off-LAN needs the Ta
 ### Per-OS packages
 
 `Makefile` splits packages into `COMMON_PACKAGES`, `LINUX_PACKAGES` and `DARWIN_PACKAGES`, selected on
-`uname -s`. `hypr`, `waybar`, `walker`, `ghostty-linux` and `ssh-linux` are Linux-only;
+`uname -s`. `hypr`, `waybar`, `walker`, `swaync`, `ghostty-linux` and `ssh-linux` are Linux-only;
 `ghostty-darwin` is macOS-only; everything else is stowed on both. Adding a top-level package means adding it to whichever
 of the three lists it belongs in.
 

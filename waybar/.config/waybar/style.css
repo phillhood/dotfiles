@@ -65,6 +65,7 @@ window#waybar {
 #system-box,
 #tray-box,
 #clock-box,
+#notif-box,
 #herdr-watchr,
 #custom-cava {
   border-radius: 4px;
@@ -159,12 +160,27 @@ window#waybar.empty #mpris {
   margin-right: -3px;
 }
 
-/* Containers: tray, clock */
+/* Containers: tray, clock, notifications */
 
 #tray-box,
 #clock-box {
   margin: 0px 4px 2px 2px;
   padding: 2px 0px;
+}
+
+/* Rightmost card: symmetric padding so the lone glyph sits centred. */
+#notif-box {
+  margin: 0px 4px 2px 2px;
+  padding: 2px 0px;
+}
+
+/* No colour here: setting it on the label beats the state colours inherited
+   from #custom-swaync, so the glyph would never change. */
+#notif-box label,
+#notif-box > widget {
+  padding: 0px;
+  margin: 0px;
+  border-radius: 3px;
 }
 
 /* Container: herdr-watchr (one card; one module per status, hidden when empty).
@@ -278,6 +294,47 @@ window#waybar.empty #mpris {
 #network.wifi,
 #network.ethernet {
   padding-right: 13px;
+}
+
+/* No min-width: it pads the label out wider than the glyph and the slack all
+   lands on the right, which no amount of padding tuning corrects. */
+#custom-swaync {
+  color: @fg;
+  padding: 0px 10px 0px 8px;
+  border-radius: 3px;
+}
+
+#custom-swaync,
+#custom-swaync label {
+  font-size: 15px;
+}
+
+#custom-swaync:hover {
+  background-color: alpha(@fg, 0.15);
+  transition: all 150ms ease;
+}
+
+#custom-swaync.notification,
+#custom-swaync.notification label {
+  color: @mauve;
+}
+
+#custom-swaync.dnd-none,
+#custom-swaync.dnd-notification,
+#custom-swaync.dnd-inhibited-none,
+#custom-swaync.dnd-inhibited-notification,
+#custom-swaync.dnd-none label,
+#custom-swaync.dnd-notification label,
+#custom-swaync.dnd-inhibited-none label,
+#custom-swaync.dnd-inhibited-notification label {
+  color: @red;
+}
+
+#custom-swaync.inhibited-none,
+#custom-swaync.inhibited-notification,
+#custom-swaync.inhibited-none label,
+#custom-swaync.inhibited-notification label {
+  color: @peach;
 }
 
 /* Single-module padding (right cluster) */

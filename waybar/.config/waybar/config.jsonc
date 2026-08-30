@@ -21,7 +21,8 @@
   "modules-right": [
     "group/tray-box",
     "group/system-box",
-    "group/clock-box"
+    "group/clock-box",
+    "group/notif-box"
   ],
   // -- left groups (visual order) --
   "group/launcher-box": {
@@ -60,6 +61,12 @@
     "orientation": "inherit",
     "modules": [
       "tray"
+    ]
+  },
+  "group/notif-box": {
+    "orientation": "inherit",
+    "modules": [
+      "custom/swaync"
     ]
   },
   "group/system-box": {
@@ -210,6 +217,28 @@
     "return-type": "json",
     "exec": "~/.config/waybar/cava.sh",
     "tooltip": false
+  },
+  // -- notifications --
+  "custom/swaync": {
+    "format": "{icon}",
+    "tooltip": false,
+    "format-icons": {
+      "none": "󰂚",
+      "notification": "󱅫",
+      "dnd-none": "󰪓",
+      "dnd-notification": "󰂠",
+      "inhibited-none": "󰪑",
+      "inhibited-notification": "󰂛",
+      "dnd-inhibited-none": "󰪑",
+      "dnd-inhibited-notification": "󰂛"
+    },
+    "return-type": "json",
+    "exec-if": "which swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-middle": "swaync-client -d -sw",
+    "on-click-right": "swaync-client -C -sw",
+    "escape": true
   },
   // -- tray --
   "tray": {

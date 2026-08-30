@@ -1,0 +1,310 @@
+/* Catppuccin Macchiato -- matches waybar/.config/waybar/style.css */
+
+:root {
+  --base:     #24273a;
+  --mantle:   #1e2030;
+  --crust:    #181926;
+  --text:     #cad3f5;
+  --subtext0: #a5adcb;
+  --surface0: #363a4f;
+  --surface1: #494d64;
+  --overlay0: #6e738d;
+  --blue:     #8aadf4;
+  --mauve:    #c6a0f6;
+  --red:      #ed8796;
+  --yellow:   #eed49f;
+  --green:    #a6da95;
+  --peach:    #f5a97f;
+
+  --cc-bg: rgba(36, 39, 58, 0.85);
+  --noti-bg: 36, 39, 58;
+  --noti-bg-alpha: 0.92;
+  --noti-bg-darker: rgba(30, 32, 48, 0.92);
+  --noti-bg-hover: rgba(54, 58, 79, 0.95);
+  --noti-bg-focus: rgba(73, 77, 100, 0.95);
+  --noti-border-color: rgba(198, 160, 246, 0.25);
+  --noti-close-bg: rgba(54, 58, 79, 0.9);
+  --noti-close-bg-hover: rgba(237, 135, 150, 0.8);
+
+  --text-color: var(--text);
+  --text-color-disabled: var(--overlay0);
+  --bg-selected: var(--mauve);
+
+  --border-radius: 4px;
+  --border: 1px solid var(--noti-border-color);
+  /* Popups. Reach is blur/2 + spread -/+ offset: 10 down, 4 up, 8 sides --
+     all inside the card margins below, so nothing clips. */
+  --notification-shadow: 0 2px 12px 2px rgba(0, 0, 0, 0.5);
+  /* Panel only -- popups keep --notification-shadow. Reach is
+     blur/2 + spread -/+ offset: 64 left and down, 16 up and right. */
+  --panel-shadow:
+    0 0 10px 2px rgba(0, 0, 0, 0.55),
+    -24px 24px 60px 10px rgba(0, 0, 0, 0.4);
+  --notification-icon-size: 48px;
+  --notification-group-icon-size: 24px;
+  --font-size-body: 13px;
+  --font-size-summary: 14px;
+}
+
+* {
+  font-family: "MesloLGS Nerd Font";
+  font-size: var(--font-size-body);
+}
+
+/* Popups
+   Chrome belongs on .notification (the card), NOT .notification-background --
+   that is the row's padding wrapper, and styling it draws a second box. */
+
+window,
+notificationwindow,
+blankwindow,
+.blank-window,
+.floating-notifications,
+.floating-notifications .notification-row,
+.floating-notifications .notification-row:focus,
+.floating-notifications .notification-row:hover,
+.floating-notifications .notification-row .notification-background {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Zero the wrapper padding: it is what offsets the card from the row, and the
+   close button overlays the row, so any padding strands the X beside the card.
+   Gap to the screen edge comes from margin, which paints nothing. */
+.floating-notifications .notification-row .notification-background {
+  padding: 0;
+  /* Same top-right corner as the control center: 16px from the exclusive zone
+     and 16px from the screen edge. Left margin is notification-window-width
+     (480) minus the 416px card minus the 16px right margin. */
+  margin: 16px 16px 16px 48px;
+}
+
+.floating-notifications .notification-row .notification-background .notification {
+  border: var(--border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--notification-shadow);
+}
+
+/* Full default paths -- shorter selectors lose to the stock sheet. */
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary {
+  font-weight: 900;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .time {
+  color: var(--subtext0);
+  font-size: 11px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .body {
+  color: var(--subtext0);
+}
+
+.notification-row .notification-background .notification .notification-action > button {
+  border-radius: var(--border-radius);
+  background: rgba(54, 58, 79, 0.8);
+}
+
+.notification-row .notification-background .notification .notification-action > button:hover {
+  background: rgba(198, 160, 246, 0.25);
+}
+
+.close-button {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 100%;
+  min-width: 18px;
+  min-height: 18px;
+  padding: 0;
+  margin-top: 4px;
+  margin-right: 4px;
+  color: var(--subtext0);
+}
+
+.close-button:hover {
+  background: transparent;
+  color: var(--red);
+}
+
+/* Urgency accents -- the class sits on .notification. */
+
+.notification-row .notification-background .notification.critical {
+  border: 1px solid var(--red);
+}
+
+.notification-row .notification-background .notification.low {
+  border: 1px solid rgba(165, 173, 203, 0.2);
+}
+
+/* Control center */
+
+/* The stock sheet styles no scrollbar at all, so this is raw Adwaita. */
+
+/* Hidden entirely: it forced an asymmetric right gutter. Wheel still scrolls. */
+.control-center scrollbar,
+.control-center scrollbar.overlay-indicator,
+.control-center scrollbar.overlay-indicator.hovering,
+.control-center scrollbar.overlay-indicator.dragging,
+.control-center scrollbar:hover,
+.control-center scrollbar trough,
+.control-center scrollbar slider {
+  background: transparent;
+  border: none;
+  min-width: 0px;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  transition: none;
+}
+
+.control-center scrollbar:disabled,
+.control-center scrollbar:disabled slider {
+  background: transparent;
+  opacity: 0;
+}
+
+.control-center undershoot.top,
+.control-center undershoot.bottom {
+  background: none;
+}
+
+
+.control-center {
+  background: var(--cc-bg);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  /* Lit from the top-right corner. Reach is blur/2 + spread -/+ offset, NOT
+     blur + offset -- so 60/10/24 gives 30 + 10 + 24 = 64 left and down, and
+     30 + 10 - 24 = 16 up and right, the cap set by the surface edge
+     (exclusive zone / screen edge). Spread is what keeps the corners as dense
+     as the edges; at spread 0 a blurred rect thins out at every corner. */
+  box-shadow: var(--panel-shadow);
+  padding: 6px;
+  /* Bleed room matching that 64px reach. Surface is 470 wide against a 406
+     panel; height fits content plus this margin. Retune together. Cards land at
+     380 after 2px border, 12px padding here and 12px group padding. Popups
+     cannot be matched exactly -- notification-window-width is a maximum and
+     they size to their content, while panel cards fill a fixed width. */
+  margin-left: 64px;
+  margin-bottom: 64px;
+}
+
+.control-center .control-center-list {
+  background: transparent;
+}
+
+/* Same fix as the popups: the row is wider than the card, so any fill or padding
+   on it shows as a box around the card and strands the close button outside it. */
+.control-center .notification-row:focus,
+.control-center .notification-row:hover,
+.control-center .notification-row {
+  background: transparent;
+}
+
+.control-center .notification-row .notification-background {
+  padding: 0;
+  margin: 0px 0px 6px 0px;
+}
+
+/* The big shadow is for popups floating over the desktop. Inside the panel it
+   just falls on the card below, and the panel already casts its own. */
+.control-center .control-center-list .notification-row .notification {
+  box-shadow: none;
+}
+
+/* The group is one card: same shade as .widget, rounded, with the header row
+   inside it rather than floating above. All three states share a background so
+   focus never shows as a highlight. */
+.control-center .notification-group,
+.control-center .notification-group:focus,
+.control-center .notification-group:hover {
+  background: rgba(30, 32, 48, 0.6);
+  border-radius: var(--border-radius);
+  padding: 6px;
+}
+
+/* Stock fades every non-expanded group to 40%. With grouping on, a lone
+   notification is a one-item group, so it dims too. */
+.control-center .notification-group.collapsed.not-expanded {
+  opacity: 1;
+}
+
+.control-center .control-center-list-placeholder {
+  color: var(--overlay0);
+  font-size: 16px;
+}
+
+.blank-window {
+  background: transparent;
+}
+
+/* Widgets */
+
+/* Notifications is the only widget left, and the group cards carry their own
+   background -- so this is a bare container, not a second shaded layer. */
+.widget {
+  background: transparent;
+  margin: 0px;
+  padding: 0px;
+  color: var(--text);
+}
+
+/* Grouping */
+
+/* Stock gives the header row margin: 0 16px -- no vertical space at all, so the
+   first card butts straight up against the title. */
+.control-center .notification-group .notification-group-headers,
+.control-center .notification-group .notification-group-buttons {
+  margin-top: 4px;
+  margin-bottom: 10px;
+  margin-left: 0px;
+}
+
+/* The only inset in the chain. Everything nested below is zeroed, so the glyph
+   lands 4px in -- the same as .close-button's margin-right on the cards. */
+.control-center .notification-group .notification-group-buttons {
+  margin-right: 4px;
+}
+
+.notification-group .notification-group-headers {
+  color: var(--subtext0);
+  font-weight: 900;
+}
+
+/* The group close button is a CONTAINER holding a .close-button; painting it
+   draws a box far larger than the glyph. Style the child, not the wrapper. */
+.notification-group .notification-group-close-button {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+
+/* Collapse and close in the group header: glyph only, matching .close-button.
+   Padding and margin zeroed at every level so only the container inset counts. */
+.notification-group .notification-group-buttons > button,
+.notification-group .notification-group-close-button,
+.notification-group .notification-group-close-button .close-button {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0px;
+  margin: 0px;
+  min-width: 18px;
+  min-height: 18px;
+  color: var(--subtext0);
+}
+
+.notification-group .notification-group-buttons > button:not(:first-child) {
+  margin-left: 10px;
+}
+
+.notification-group .notification-group-buttons > button:hover {
+  background: transparent;
+  color: var(--red);
+}
