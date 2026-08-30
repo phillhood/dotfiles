@@ -301,15 +301,10 @@ end)
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("/home/phill/.config/hypr/scripts/mic-mute.sh"), { locked = true })
 -- F24 (Nuphy Air75 V3) -> mic mute at the PipeWire source: Discord can't grab
 -- global hotkeys under Wayland. A chirp signals state (Discord's own UI won't).
-hl.bind("F24", hl.dsp.exec_cmd(
-	"wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && "
-	.. "if wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED; "
-	.. "then paplay /usr/share/sounds/freedesktop/stereo/device-removed.oga; "
-	.. "else paplay /usr/share/sounds/freedesktop/stereo/device-added.oga; fi"
-), { locked = true })
+hl.bind("F24", hl.dsp.exec_cmd("/home/phill/.config/hypr/scripts/mic-mute.sh"), { locked = true })
 -- Playback (works with any MPRIS player: Spotify, browsers, mpv, etc.)
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
