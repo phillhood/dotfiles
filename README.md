@@ -25,7 +25,7 @@ config immediately — the deployed files are symlinks back into this repo.
 | `k9s`       | `~/.config/k9s/*`                                               |
 | `helm`      | `~/.config/helm/repositories.yaml`                              |
 | `hypr`      | `~/.config/hypr/{hyprland.lua,hyprland-gui.lua,themes,scripts}` |
-| `waybar`    | `~/.config/waybar/{config.jsonc,style.css,*.sh}`                |
+| `waybar`    | `~/.config/waybar/{bars.jsonc,config.jsonc,style.css,*.sh}`     |
 | `walker`    | `~/.config/walker/*`                                            |
 | `ghostty`   | `~/.config/ghostty/config`                                      |
 | `ghostty-darwin` / `ghostty-linux` | `~/.config/ghostty/os.conf` (per-OS overlay)    |

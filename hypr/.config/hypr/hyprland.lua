@@ -43,7 +43,7 @@ hl.on("hyprland.start", function()
 	-- the loop respawns on crash (waybar SIGSEGVs racing Hyprland at boot), 1->8s
 	-- backoff resetting after a healthy >=10s run. Reload: `killall -SIGUSR2 waybar`,
 	-- restart: `killall waybar`. Never launch waybar by hand (bypasses the supervisor).
-	hl.exec_cmd("bash -c 'pkill -x waybar 2>/dev/null; d=1; while true; do t=$SECONDS; waybar; if [ $((SECONDS-t)) -ge 10 ]; then d=1; else d=$(( d<8 ? d*2 : 8 )); fi; sleep $d; done'")
+	hl.exec_cmd("bash -c 'pkill -x waybar 2>/dev/null; d=1; while true; do t=$SECONDS; waybar -c ~/.config/waybar/bars.jsonc; if [ $((SECONDS-t)) -ge 10 ]; then d=1; else d=$(( d<8 ? d*2 : 8 )); fi; sleep $d; done'")
 	hl.exec_cmd("swaync")
 	hl.exec_cmd("awww-daemon")
 	hl.exec_cmd("bash -c 'M=" .. main_mon .. "; S=" .. side_mon .. "; until awww query >/dev/null 2>&1; do sleep 0.2; done; L=~/Pictures/Wallpapers/deep-space-cosmic-5120x2880-21267.jpg; P=~/Pictures/Wallpapers/cyberpunk_portrait.jpg; awww img -o $M $L; awww img -o $S $P; while sleep 2; do awww query 2>/dev/null | grep $M | grep -q color: && awww img -o $M $L; awww query 2>/dev/null | grep $S | grep -q color: && awww img -o $S $P; done'")

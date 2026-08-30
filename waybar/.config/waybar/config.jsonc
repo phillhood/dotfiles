@@ -124,6 +124,7 @@
   // -- workspaces --
   "hyprland/workspaces": {
     "disable-scroll": true,
+    "sort-by": "id",
     "all-outputs": false,
     "cursor": true,
     "format": "{icon} {windows}",

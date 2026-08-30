@@ -3,10 +3,32 @@ set -u
 bars=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
 # Catppuccin Macchiato gradient, indexed by bar height (0 = quiet .. 7 = loud)
 colors=('#8aadf4' '#7dc4e4' '#91d7e3' '#8bd5ca' '#a6da95' '#eed49f' '#f5a97f' '#ed8796')
-config_file="/tmp/waybar_cava_config"
+
+output="${1:-}"
+density="${CAVA_BARS_PER_1000PX:-86}"
+bar_count=22
+
+monitor_width() {
+    [[ -n "$output" ]] || return 1
+    command -v hyprctl >/dev/null 2>&1 || return 1
+    command -v jq >/dev/null 2>&1 || return 1
+    hyprctl monitors -j 2>/dev/null | jq -er --arg o "$output" '
+        .[] | select(.name == $o)
+        | (if (.transform % 2) == 1 then .height else .width end) / .scale
+        | floor'
+}
+
+width="$(monitor_width || true)"
+if [[ "$width" =~ ^[0-9]+$ ]] && (( width > 0 )); then
+    bar_count=$(( width * density / 10000 ))
+    (( bar_count < 8 )) && bar_count=8
+    (( bar_count > 64 )) && bar_count=64
+fi
+
+config_file="/tmp/waybar_cava_config${output:+_$output}"
 cat > "$config_file" <<EOF
 [general]
-bars = 36
+bars = $bar_count
 framerate = 24
 autosens = 1
 lower_cutoff_freq = 30

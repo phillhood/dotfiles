@@ -1,0 +1,24 @@
+// Multi-bar wrapper: one bar per output, each including the shared config.
+// The including object wins on duplicate keys, so only custom/cava is overridden.
+[
+  {
+    "output": ["DP-1"],
+    "custom/cava": {
+      "format": "{}",
+      "return-type": "json",
+      "exec": "~/.config/waybar/cava.sh DP-1",
+      "tooltip": false
+    },
+    "include": ["/home/phill/.config/waybar/config.jsonc"]
+  },
+  {
+    "output": ["DP-2"],
+    "custom/cava": {
+      "format": "{}",
+      "return-type": "json",
+      "exec": "~/.config/waybar/cava.sh DP-2",
+      "tooltip": false
+    },
+    "include": ["/home/phill/.config/waybar/config.jsonc"]
+  }
+]
