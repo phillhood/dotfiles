@@ -5,3 +5,9 @@
 # so a bare `\.bak.*$` would never match `config.toml.bak-...` — hence `.*`.
 .*\.bak.*
 \.stow-local-ignore
+# herdr state
+release-notes\.json
+session\.json
+\.plugins\.lock
+.*\.log
+.*\.sock

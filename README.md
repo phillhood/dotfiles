@@ -48,6 +48,14 @@ The `herdr` package is additionally reached via `HERDR_CONFIG_PATH` (exported in
 points herdr straight at the repo copy. The stowed symlink stays as a fallback for any herdr started
 without that variable; both routes resolve to the same file, so they cannot diverge.
 
+That env var is why `herdr/.stow-local-ignore` also lists `release-notes.json`, `session.json`,
+`.plugins.lock`, `.*\.log` and `.*\.sock`: herdr writes its state beside its config, and its config is
+the repo copy, so those files reappear in the package on every run. Gitignore hides them from git but
+not from stow, which then tries to symlink each one over the real file of the same name already in
+`~/.config/herdr` — a conflict. Stow plans all packages before applying any, so one such conflict
+prints `All operations aborted` and leaves *every* package unlinked, which reads as `make restow`
+silently doing nothing.
+
 Repo-only (not stowed): `tools/` — terminal colour-scheme tooling in `tools/terminals/`, plus
 `tools/canonical/` (reference configs a tool rewrites live — `.claude/settings.json` and
 `.ssh/config` — applied by `bootstrap`, not stow).
