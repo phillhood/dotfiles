@@ -178,6 +178,12 @@ If findings return, dispatch **one** fix subagent with the complete list — not
 
 ## Finish
 
-Final review clean and fixes merged: delete this plan's workspace — git history is the record now. Leave sibling plan directories alone.
+**Harvest the ledger before deleting anything.** Git history records what was done; nothing records what was deliberately *not* done. Every deferred minor, parked ruling, follow-up and known-gap line in `progress.md` dies with the workspace unless you move it first.
+
+Walk the ledger and fold each surviving item into the `.docs` file that owns the topic — the durable tree, not a new dated file. Split them by kind: engineering debt and known gaps go beside the code they describe; interaction, styling and craft items go to whatever phase or section owns that pass. **Verify each one still holds against the merged code before writing it** — a later task often fixes an earlier task's minor, and recording a fixed item as outstanding is its own kind of wrong. Drop the ones that no longer reproduce.
+
+Say plainly in the write-up that these were reviewed and left on purpose, so the next reader treats them as decisions rather than oversights. Where a fix report or a review overclaimed — said an item was closed when it was not — record the correction explicitly; that is the one thing nobody else will catch.
+
+Then delete this plan's workspace. Leave sibling plan directories alone.
 
 Then `workflow:finish`.
