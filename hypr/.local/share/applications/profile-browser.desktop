@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Browser (profile)
+GenericName=Web Browser
+Exec=/home/phill/.config/hypr/scripts/browser.sh %u
+Icon=web-browser
+Terminal=false
+NoDisplay=true
+Categories=Network;WebBrowser;
+MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;

@@ -148,6 +148,11 @@ hl.window_rule({
 })
 
 hl.window_rule({
+	match = { class = "firefox" },
+	opacity = "1.0 override",
+})
+
+hl.window_rule({
 	match = { class = "Spotify" },
 	opacity = "1.0 override",
 })
@@ -221,7 +226,7 @@ hl.on("workspace.active", sync_noti_monitor)
 --------------------
 local terminal = "ghostty"
 local fileManager = "nemo"
-local browser = "brave"
+local browser = "/home/phill/.config/hypr/scripts/browser.sh"
 local music = "flatpak run com.spotify.Client"
 local notes = "obsidian"
 local launcher = "walker"
