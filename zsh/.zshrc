@@ -96,6 +96,11 @@ alias edit="spiceedit"
 alias k='kubectl'
 alias kctx='kubectx'
 alias kns='kubens'
+# Herdr
+hs() { herdr --session "${1:-default}" }
+alias hsl='herdr session list'
+alias hsk='herdr session stop'
+alias hsd='herdr session delete'
 
 # ---- Environment ----
 export SOPS_AGE_KEY_FILE="$HOME/.age/dev.txt"
