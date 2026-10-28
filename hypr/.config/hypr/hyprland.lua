@@ -208,6 +208,12 @@ hl.layer_rule({
 	ignore_alpha = 0.4,
 })
 
+hl.layer_rule({
+	name = "snip-no-anim",
+	match = "^(hyprpicker|selection)$",
+	no_anim = true,
+})
+
 --------------------------
 ----  NOTIFICATIONS  ----
 --------------------------

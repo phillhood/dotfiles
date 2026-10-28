@@ -10,17 +10,35 @@
 # monitor), leaving the game untouched.
 
 tmp="$(mktemp --suffix=.png)"
-trap 'rm -f "$tmp"' EXIT
+full="$(mktemp --suffix=.ppm)"
+picker=""
+trap 'rm -f "$tmp" "$full"; [ -n "$picker" ] && kill "$picker" 2>/dev/null' EXIT
+
+# Must run before slurp: slurp takes pointer focus and transient tooltips close.
+grim -t ppm "$full" || exit 0
+if command -v hyprpicker >/dev/null; then
+    hyprpicker -r -z -d >/dev/null 2>&1 &
+    picker=$!
+    # slurp must map after hyprpicker or the frozen frame covers it.
+    for _ in $(seq 1 40); do
+        hyprctl layers -j | jq -e '[.. | objects | select(.namespace? == "hyprpicker")] | length > 0' >/dev/null && break
+        sleep 0.005
+    done
+fi
 
 # Region selection; cancel (Esc) -> empty output -> exit quietly.
 geom="$(slurp)" || exit 0
 [ -n "$geom" ] || exit 0
+[ -n "$picker" ] && kill "$picker" 2>/dev/null
+picker=""
 
-# grim writes the PNG directly to the file (piping it via hyprshot --raw got
-# TRUNCATED under a busy fullscreen game). Bail if grim fails or the result is
-# truncated: a partial PNG (no trailing IEND chunk) on the clipboard renders cut
-# off and freezes whatever you paste into.
-grim -g "$geom" "$tmp" || exit 0
+# Assumes every monitor is at scale 1.
+read -r ox oy < <(hyprctl monitors -j | jq -r '[min_by(.x).x, min_by(.y).y] | @tsv')
+read -r gx gy gw gh < <(tr ',x' '  ' <<<"$geom")
+magick "$full" -crop "${gw}x${gh}+$((gx - ox))+$((gy - oy))" +repage "png:$tmp" || exit 0
+
+# Bail if the result is truncated: a partial PNG (no trailing IEND chunk) on the
+# clipboard renders cut off and freezes whatever you paste into.
 if [ ! -s "$tmp" ] || ! tail -c 8 "$tmp" | grep -qa IEND; then
     exit 0
 fi
