@@ -1,0 +1,6 @@
+# Aethon identity (overrides default)
+[user]
+	email = phood@aethonaerial.com
+	name = Phill Hood
+[core]
+	sshCommand = ssh -i ~/.ssh/id_rsa_aethon -o IdentitiesOnly=yes

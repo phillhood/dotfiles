@@ -24,3 +24,7 @@
 # Ctrl identity (goctrl org — pushes as phill-goctrl via ~/.ssh/id_ctrl)
 [includeIf "gitdir:~/Dev/ctrl/"]
 	path = ~/.gitconfig-ctrl
+
+# Aethon identity (Azure DevOps via ~/.ssh/id_rsa_aethon)
+[includeIf "gitdir:~/Dev/aethon/"]
+	path = ~/.gitconfig-aethon
