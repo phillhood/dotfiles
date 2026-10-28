@@ -222,6 +222,13 @@ window#waybar.empty #mpris {
   box-shadow: none;
 }
 
+#custom-profile-home,
+#custom-profile-work,
+#custom-profile-alert {
+  padding: 0px 9px;
+  margin: 1px 1px;
+}
+
 #workspaces {
   border-radius: 5px;
   background-color: alpha(@base, 0.55);
