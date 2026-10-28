@@ -6,6 +6,7 @@ auto_switch = false
 
 [theme.custom]
 surface_dim = "#3a3d52"
+active_row_bg = "#3a3d52"
 
 [keys]
 prefix = "ctrl+s"
