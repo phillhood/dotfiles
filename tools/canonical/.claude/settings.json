@@ -1,22 +1,21 @@
 {
   "permissions": {
-    "allow": [
-      "Read(.planning/*)",
-      "Write(.planning/*)",
-      "Read(STATE.md)",
-      "Write(STATE.md)"
-    ],
+    "allow": [],
     "deny": [
       "Read(.env)",
       "Read(.env.*)",
       "Read(.secrets)"
     ],
-    "defaultMode": "default"
+    "defaultMode": "auto"
   },
-  "model": "opus",
-  "effortLevel": "xhigh",
-  "advisorModel": "fable",
-  "theme": "dark",
+  "effortLevel": "medium",
+  "alwaysThinkingEnabled": true,
+  "autoCompactEnabled": true,
+  "enableWorkflows": true,
+  "theme": "auto",
+  "env": {
+    "_ZO_DOCTOR": "0"
+  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -42,10 +41,26 @@
   },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true
+    "code-simplifier@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "codex@openai-codex": true,
+    "i-have-adhd@i-have-adhd": true
+  },
+  "extraKnownMarketplaces": {
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "i-have-adhd": {
+      "source": {
+        "source": "github",
+        "repo": "ayghri/i-have-adhd"
+      }
+    }
   },
   "remoteControlAtStartup": false,
-  "agentPushNotifEnabled": false
+  "agentPushNotifEnabled": true
 }
