@@ -35,6 +35,7 @@ hl.on("hyprland.start", function()
 	-- Waybar supervisor -- never launch waybar by hand, it bypasses this.
 	hl.exec_cmd("bash -c 'pkill -x waybar 2>/dev/null; d=1; while true; do t=$SECONDS; waybar -c ~/.config/waybar/bars.jsonc -s $XDG_RUNTIME_DIR/waybar-style.css; if [ $((SECONDS-t)) -ge 10 ]; then d=1; else d=$(( d<8 ? d*2 : 8 )); fi; sleep $d; done'")
 	hl.exec_cmd("swaync")
+	hl.exec_cmd("~/.config/swaync/notify-profile.py")
 	hl.exec_cmd("awww-daemon")
 	hl.exec_cmd("bash -c 'w() { awww img -o $1 \"$(cat $XDG_RUNTIME_DIR/hypr-wallpaper-$1)\"; }; until awww query >/dev/null 2>&1; do sleep 0.2; done; for o in " .. main_mon .. " " .. side_mon .. "; do w $o; done; while sleep 2; do for o in " .. main_mon .. " " .. side_mon .. "; do awww query 2>/dev/null | grep $o | grep -q color: && w $o; done; done'")
 	hl.exec_cmd("wl-paste --watch cliphist store")

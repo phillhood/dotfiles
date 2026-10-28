@@ -40,10 +40,10 @@
     }
   },
   "scripts": {
-    "runelite-focus": {
-      "app-name": "RuneLite",
+    "focus-sender": {
+      "app-name": ".*",
       "run-on": "action",
-      "exec": "/home/phill/.config/swaync/focus-app.sh '^net%-runelite%-client%-RuneLite$'"
+      "exec": "/home/phill/.config/swaync/notify-profile.py focus"
     }
   }
 }
