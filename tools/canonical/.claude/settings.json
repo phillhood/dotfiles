@@ -2,11 +2,21 @@
   "permissions": {
     "allow": [],
     "deny": [
-      "Read(.env)",
-      "Read(.env.*)",
-      "Read(.secrets)"
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/.secrets)",
+      "Read(~/.ssh/id_*)"
     ],
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "ask": [
+      "Bash(docker volume rm *)",
+      "Bash(git branch -D *)",
+      "Bash(git checkout -- *)",
+      "Bash(git clean *)",
+      "Bash(git reset --hard *)"
+    ]
   },
   "effortLevel": "medium",
   "alwaysThinkingEnabled": true,
@@ -34,6 +44,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/uv-python.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/commit-msg-guard.sh"
           }
         ]
       }

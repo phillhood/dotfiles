@@ -1,8 +1,7 @@
 # Git commits
 - Do not add a `Co-Authored-By` trailer or any "Generated with Claude Code" annotation to commits.
-- Write simple, lowercase commit messages (e.g. `fix login redirect`, not `Fix: Login Redirect`).
-- No prefix or tag — not `docs:`, not conventional-commits `feat:`/`fix:`, no scope parens like `ansible(proxmox_host):`. Just say what changed: `setup ansible`, `point host resolver at pi-hole`. Comma-separated clauses are fine.
-- Model the message on the most recent handful of commits in that repo. Where a repo's history uses ticket IDs (`CORE-155 ...`), match the history.
+- Write simple, lowercase commit messages.
+- Model the message on the most recent handful of commits in that repo. Where a repo's history uses ticket IDs (`CORE-155 ...`) or prefixes (`fix(console): ...`), match the history.
 
 # Project docs
 - **A committed `docs/` wins.** If the project specifies that documentation belongs in the repo, or a top-level `docs/` already exists, write there — docs are part of that repo's committed surface. Otherwise use the local trees below, and never create a top-level `docs/` where none exists.
@@ -47,7 +46,5 @@
 
 # Multi-agent workflow
 - Codex is your senior coding teammate: use Codex by asking for help or opinions as you work through difficult problems and need to consult another resource
-- `/codex:review` — routine review of completed work, as tasks finish.
-- `/codex:adversarial-review` — when the change is risky: auth, permissions, tenant isolation, data loss, migrations, schema change, rollback, retries, idempotency, concurrency, ordering. Codex tries to break confidence in the change rather than validate it, and reports material findings only. Review-only — it never fixes.
 - `/codex:rescue` — investigations, bugs, and explicit fix requests.
-- Findings from any of these come back through the `workflow:review-response` skill: verify against the codebase before agreeing, push back with reasoning where a finding doesn't hold.
+- Review happens when work lands — `workflow:finish` picks the reviewer. Findings from any reviewer go through `workflow:review-response`.

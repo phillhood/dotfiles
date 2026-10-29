@@ -27,6 +27,6 @@ If the finding is only relevant to the task in hand and won't outlive it, it bel
 
 ## Delegating
 
-When the reading is broad enough that it would fill this session's context — several sources, a lot of pages — offer to run it in a subagent and say why. Don't dispatch one unasked.
+When the reading is broad enough that it would fill this session's context — several sources, a lot of pages — run it in a subagent and say why in one line.
 
 A subagent gets: the question, the sources to start from, the output path, and the sourcing rules above. It returns the file path, not the findings.

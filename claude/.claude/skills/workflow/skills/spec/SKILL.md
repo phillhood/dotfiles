@@ -7,7 +7,7 @@ description: Use before any creative work - new features, components, functional
 
 Turn an idea into an agreed design, then write it down.
 
-**No code, no scaffolding, no other skill until the design is approved.** This holds for small work too — "simple" is where unexamined assumptions cost the most. A short design is fine. Skipping it is not.
+**No code, no scaffolding, no other skill until the design is approved.** The exception is small, unambiguous work — a few files, no new interface, nothing you'd have to ask: state the design in a line or two and build it. If writing that line turns up a choice or an assumption, it isn't small — do the full spec.
 
 ## Steps
 
@@ -15,13 +15,13 @@ Create a todo per step.
 
 1. **Read the project first.** Files, README, recent commits.
 2. **Check the scope.** If the request covers several independent subsystems, say so before spending questions on detail. Decompose, then spec the first piece. Each piece gets its own spec → plan → implementation cycle.
-3. **Ask one question per message.** Purpose, constraints, success criteria. Multiple choice where it fits, open-ended where it doesn't.
-4. **Offer 2-3 approaches** with trade-offs. Lead with your recommendation and say why. Cut anything YAGNI.
-5. **Present the design in sections**, each scaled to its complexity — a sentence where it's obvious, a few hundred words where it isn't. Ask after each whether it holds. Cover architecture, components, data flow, error handling, testing.
+3. **Ask only what you can't infer, all in one message.** Purpose, constraints, success criteria — and only where the answer changes the design. Each question carries your recommended answer. Multiple choice where it fits. Nothing to ask: skip this step.
+4. **Choose an approach.** Where 2-3 are genuinely viable, the spec lists them with trade-offs, your pick and why. Cut anything YAGNI.
+5. **Write the design**, each section scaled to its complexity — a sentence where it's obvious, a few hundred words where it isn't. Cover architecture, components, data flow, error handling, testing. Mark every assumption you made instead of asking.
 6. **Write it to `.dev/spec/YYYY-MM-DD-<topic>.md`.** That tree is gitignored — nothing here gets committed.
 7. **Self-review the file, fix inline:** placeholders and TBDs, sections that contradict each other, scope that needs splitting, requirements readable two ways.
-8. **Hand it over and wait:** "Spec written to `<path>`. Review it and tell me what to change before I plan."
-9. **Then `workflow:plan`.** No other skill.
+8. **Hand it over and wait** — this is the one stop: "Spec written to `<path>`. Approve, or tell me what to change." Lead with the assumptions and the approach choice, since those are what the review is for.
+9. **On approval, run `workflow:plan` then `workflow:implement` without stopping.**
 
 ## Architecture decisions
 

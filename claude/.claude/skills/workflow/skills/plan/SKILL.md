@@ -113,4 +113,4 @@ Run this yourself against the spec, then fix inline. No second pass.
 
 ## Handoff
 
-Save the plan, then say where it is and hand to `workflow:implement`.
+Save the plan, say where it is in one line, and go straight into `workflow:implement`. The plan is not a stop.

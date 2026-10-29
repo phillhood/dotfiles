@@ -23,7 +23,7 @@ git rev-parse --show-superproject-working-tree
 
 `GIT_DIR != GIT_COMMON` means a linked worktree — **unless** the third command prints a path, which means a submodule. Already isolated: use it, don't nest.
 
-Otherwise ask before creating one, unless the user has already said to use worktrees. Then `EnterWorktree`.
+Otherwise create one with `EnterWorktree` — don't ask.
 
 **Symlink the local trees.** A worktree checks out tracked files only, so `.dev` and `.docs` aren't there:
 
@@ -54,7 +54,7 @@ Check for `<workspace>/progress.md`:
 
 **Read the plan once.** Note its context and Global Constraints. Create a todo per task.
 
-**Pre-flight scan.** Before Task 1, read the plan for conflicts: tasks contradicting each other or the Global Constraints, and anything the plan mandates that a reviewer would call a defect (a test asserting nothing, a duplicated logic block). Present everything you find as one batched question — each finding beside the plan text mandating it — and ask which governs. Clean scan: proceed silently.
+**Pre-flight scan.** Before Task 1, read the plan for conflicts: tasks contradicting each other or the Global Constraints, and anything the plan mandates that a reviewer would call a defect (a test asserting nothing, a duplicated logic block). Settle each against the spec: where the spec decides it, the spec governs — record `pre-flight: <conflict> — ruling: <which governs, why>` in the ledger and carry on. Ask only about conflicts the spec doesn't settle and whose answer changes behaviour or scope, all in one message, each beside the plan text. Clean scan: proceed silently.
 
 ## Tightly-coupled plans
 
@@ -131,7 +131,7 @@ Triggers on spec ❌, any Critical or Important finding, or a ⚠️ you confirm
 Two things leave immediately:
 
 - **Minor findings** go to the ledger (`Task <N>: minor (deferred): <one-liner>`) and get pointed out to the final review. They never enter the loop.
-- **Plan-mandated findings** — anything conflicting with what the plan requires — are the user's call. Present the finding beside the plan text and ask which governs. Don't dismiss it because the plan mandates it, and don't dispatch a fix contradicting the plan.
+- **Plan-mandated findings** — anything conflicting with what the plan requires — get settled against the spec, as in the pre-flight scan. Where the spec decides, record the ruling in the ledger and act on it. Where it doesn't and the answer changes behaviour or scope, it's the user's call: present the finding beside the plan text and ask. Don't dismiss a finding because the plan mandates it.
 
 Everything else loops. One fix dispatch plus one scoped re-review is a round. **Five rounds maximum.**
 
