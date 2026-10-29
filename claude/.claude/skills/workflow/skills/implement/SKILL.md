@@ -72,7 +72,7 @@ Use the least capable model that can do the job, and **always name it explicitly
 - Design judgement or broad codebase understanding: most capable.
 - Reviewers: scale to the diff's size and risk. Scoped re-reviews of small fix diffs are cheap-to-mid.
 - Fix rounds 4-5: at least one tier above the implementer that got stuck.
-- Final whole-branch review: most capable.
+- Final whole-branch review: `/code-review high`, not a dispatched reviewer.
 
 Turn count beats token price. The cheapest models often take 2-3× the turns on multi-step work and cost more overall, so use mid-tier as the floor for reviewers and for implementers working from prose.
 
@@ -170,7 +170,12 @@ Never advance while Critical or Important findings are neither fixed nor parked-
 
 ## Final review
 
-Generate the package over the whole branch: `scripts/review-package PLAN_FILE MERGE_BASE HEAD`, where MERGE_BASE is `git merge-base <base-branch> HEAD`. Dispatch on the most capable model using `prompts/final-reviewer.md`, and point it at the ledger's deferred-minor and parked lines so it can triage what must be fixed before merge.
+Run `/code-review high <branch>` — name the branch, since bare `/code-review` reviews the current uncommitted diff. It finds correctness bugs across task boundaries, which no single task review could see, and verifies each finding before reporting it.
+
+Then do the two checks it can't, since only you hold the plan and ledger:
+
+- **Coverage** — walk each spec requirement and point at the code that meets it. A gap is a finding.
+- **Deferred and parked lines** — triage each against the finished branch: fixed since, still minor, or must-fix before merge. Must-fix items join the findings.
 
 **Escalate to `/codex:adversarial-review`** when the branch touches auth, permissions or tenant isolation; data loss, migrations or schema change; rollback, retries or idempotency; or concurrency, ordering and re-entrancy. It reviews the same range and tries to break confidence in the change rather than confirm it. Findings from either reviewer come back through `workflow:review-response`.
 

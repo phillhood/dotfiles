@@ -11,7 +11,6 @@ This bundle derives from two MIT-licensed projects.
 - `skills/implement/prompts/implementer.md`
 - `skills/implement/prompts/task-reviewer.md`
 - `skills/implement/prompts/re-review.md`
-- `skills/implement/prompts/final-reviewer.md` (from `requesting-code-review/code-reviewer.md`)
 - `skills/debug/references/root-cause-tracing.md`
 - `skills/debug/references/defense-in-depth.md`
 - `skills/debug/references/condition-based-waiting.md`
