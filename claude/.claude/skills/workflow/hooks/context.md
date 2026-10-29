@@ -6,8 +6,6 @@ Workflow skills are available:
   approved spec                   ->  workflow:plan
   written plan                    ->  workflow:implement
   bug, test failure, surprise     ->  workflow:debug
-  writing a feature or fix        ->  workflow:tdd
-  about to claim done             ->  workflow:verify
   review findings came back       ->  workflow:review-response
   work ready to land              ->  workflow:finish
   work continues elsewhere        ->  workflow:handoff

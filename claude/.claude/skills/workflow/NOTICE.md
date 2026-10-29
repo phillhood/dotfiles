@@ -24,8 +24,6 @@ This bundle derives from two MIT-licensed projects.
 - `skills/plan/SKILL.md` (from `writing-plans`)
 - `skills/implement/SKILL.md` (from `subagent-driven-development`, absorbing `executing-plans` and `using-git-worktrees`)
 - `skills/debug/SKILL.md` (from `systematic-debugging`)
-- `skills/tdd/SKILL.md` (from `test-driven-development`)
-- `skills/verify/SKILL.md` (from `verification-before-completion`)
 - `skills/review-response/SKILL.md` (from `receiving-code-review`)
 - `skills/finish/SKILL.md` (from `finishing-a-development-branch`)
 

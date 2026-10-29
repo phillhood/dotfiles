@@ -39,7 +39,7 @@ If it worked, go to phase 4. If it didn't, form a *new* hypothesis — do not st
 
 ## 4. Fix
 
-Write a failing test that reproduces the bug first — see `workflow:tdd`. Then fix the cause you identified, not the symptom, and confirm the original reproduction now passes.
+Write a failing test that reproduces the bug first, and watch it fail. Then fix the cause you identified, not the symptom, and confirm the original reproduction now passes.
 
 Consider whether the same defect exists elsewhere, and whether a guard at another layer would have caught it. See `references/defense-in-depth.md`.
 

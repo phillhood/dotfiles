@@ -19,6 +19,11 @@
 - This applies inside `AskUserQuestion` options too — the option that says "(Recommended)" carries its own justification, since the prose above it may not be read alongside it.
 - Where you're unsure, say so and say what would settle it.
 
+# Verification and tests
+- Before saying something works, is fixed, or passes, run the command that proves it — in full, fresh — and read the output and exit code. A subagent's report is not evidence; check the diff.
+- A bug fix starts with a test that reproduces the symptom, seen failing before the fix.
+- Before writing a test, name the production change that would make it fail. Assert on real behaviour, not on mocks.
+
 # Code comments
 - Default to zero comments. Keep one only when it prevents a concrete regression — a terse guard on a genuine footgun where deleting the line silently breaks something. Anything that explains *why* goes in the docs.
 - No rationale, no dated verification notes (`VERIFIED against X on <date>`), no narration of what a block does.
