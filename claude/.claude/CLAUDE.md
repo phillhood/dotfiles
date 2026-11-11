@@ -48,6 +48,13 @@
   - Don't combine `-l` and `-c` in one invocation; it produces empty output rather than a complaint.
   - `grep -r pat .` → `rg pat`. `--include=GLOB` → `-g GLOB`. `-l/-c/-o/-i/-v/-w/-n/-A/-B/-C` all behave the same.
   - Reading stdin works normally, so `cmd | grep pat` is fine — just without `-E`.
+- **Python: never `python`, `python3`, `pip` or `pip3`.** A hook blocks them anywhere in the command. Use `uv run python` (`uv run python - <<'EOF'` for heredocs) or `uv pip`.
+  - Don't edit files with a Python or sed replace script. Use the Edit tool for exact replacements and Write for new files.
+- **Worktree-isolated sessions refuse any command they can't prove stays out of git.** These shapes get refused:
+  - `xargs ... sh -c '...'` or `find -exec sh -c`: use a `for` loop over literal paths, or the Read tool.
+  - A variable holding a path that gets passed to a command, like `S=/tmp/...; sops -d $S/x`: spell the path out.
+  - Long `;`/`&&` chains that mix `cd`, `mktemp`, subshells and `$(...)`.
+  - When one gets refused, split it into separate plain Bash calls with literal arguments. Don't retry the same shape.
 
 # Multi-agent workflow
 - Codex is your senior coding teammate: use Codex by asking for help or opinions as you work through difficult problems and need to consult another resource
