@@ -87,7 +87,7 @@ The homelab hosts are Linux-only because they pin `~/.ssh/id_ed25519_homelab` wi
 Prerequisite: `stow` installed (`sudo pacman -S stow`, or `brew install stow` on macOS).
 
 ```sh
-git clone https://git.lab.shychedelic.com/phillhood/dotfiles.git ~/Dev/phillhood/dotfiles
+git clone https://git.lab.phillhood.ca/phillhood/dotfiles.git ~/Dev/phillhood/dotfiles
 cd ~/Dev/phillhood/dotfiles
 make install          # symlink every package for this OS into $HOME
 ```
@@ -97,13 +97,13 @@ Clone to that exact path on every host — `HERDR_CONFIG_PATH` in `zsh/.zshrc` h
 ### Forgejo remote
 
 The initial clone uses HTTPS because it needs no local setup: Forgejo's SSH is the built-in server on
-**192.168.1.103 port 2222**, not port 22 (that is the host's own sshd, which rejects `git@`), and the
-`git.lab.shychedelic.com` reverse proxy only forwards HTTP. The `Host` block that hides the port lives
+**192.168.1.102 port 2222**, not port 22 (that is the host's own sshd, which rejects `git@`), and the
+`git.lab.phillhood.ca` reverse proxy only forwards HTTP. The `Host` block that hides the port lives
 in `ssh/.ssh/config.d/forge.conf` — inside this repo, so it isn't available until after the first
-`make stow`. Once stowed, `forge.home` and `git.lab.shychedelic.com` both route to :2222 and
+`make stow`. Once stowed, `forge.home` and `git.lab.phillhood.ca` both route to :2222 and
 
 ```sh
-git remote set-url origin git@git.lab.shychedelic.com:phillhood/dotfiles.git
+git remote set-url origin git@git.lab.phillhood.ca:phillhood/dotfiles.git
 ```
 
 works. Port 2222 is LAN-only and not proxied to the WAN, so off-LAN needs the Tailscale path or HTTPS.
