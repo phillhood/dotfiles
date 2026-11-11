@@ -51,6 +51,18 @@ backend_state() {
   fi
 }
 
+connected_tooltip() {
+  tailscale status --json 2>/dev/null | jq -r '
+    [
+      "Tailscale: \(.CurrentTailnet.Name // "connected")",
+      "\(.Self.DNSName // .Self.HostName | split(".")[0])  \(.TailscaleIPs[0] // "")",
+      ([.Peer[]? | select(.ExitNode)][0] | select(.) | "Exit node: \(.DNSName | split(".")[0])"),
+      "\([.Peer[]? | select(.Online)] | length)/\([.Peer[]?] | length) peers online",
+      (.Health[]? | "⚠ \(.)")
+    ] | join("\n") | @html
+  ' 2>/dev/null
+}
+
 emit_json() {
   local text="$1"
   local tooltip="$2"
@@ -71,7 +83,9 @@ emit_icon() {
 
   case "$state" in
     running)
-      emit_json "<span color='#8bd5ca'>󰕥</span>" "Tailscale: connected" "connected"
+      local tooltip
+      tooltip="$(connected_tooltip)"
+      emit_json "<span color='#8bd5ca'>󰕥</span>" "${tooltip:-Tailscale: connected}" "connected"
       ;;
     missing)
       emit_json "<span color='#6e738d'>󰕥</span>" "Tailscale command not found" "disconnected"
