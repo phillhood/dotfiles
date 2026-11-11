@@ -1,13 +1,16 @@
 ---
 name: implement
-description: Use when a written plan exists and the work should be built. Dispatches a fresh subagent per task with review gates between them, tracking progress in a ledger that survives compaction.
+description: Use when a written plan exists and the work should be built. Works small plans inline and dispatches a subagent per task for larger ones, with one review of the whole branch at the end, tracking progress in a ledger that survives compaction.
+disable-model-invocation: true
 ---
 
 # Implement
 
-Execute a plan task by task. Each task gets a fresh implementer subagent, a review, and a fix loop; the branch gets one broad review at the end.
+Execute a plan task by task. Small or coupled plans run inline; larger ones get a fresh implementer subagent per task. The branch gets one broad review at the end. Per-task review is reserved for high-risk tasks.
 
 Subagents never inherit your session history — you construct exactly what each one needs. That keeps them focused and keeps your own context free for coordination.
+
+**Keep the controller lean.** Your context is re-read on every turn, and it is the dominant cost of this loop. Don't read full diffs, test output or subagent transcripts yourself — the implementer verifies and reports, you check `git log --oneline BASE..HEAD` and the report's test line. Never paste a report back into a dispatch; pass its path.
 
 **Execute all tasks without stopping.** Don't check in between them. The only reasons to stop are a blocker you can't resolve, ambiguity that genuinely prevents progress, or completion. Between tool calls, narrate at most one short line — the ledger and the tool results are the record.
 
@@ -56,9 +59,9 @@ Check for `<workspace>/progress.md`:
 
 **Pre-flight scan.** Before Task 1, read the plan for conflicts: tasks contradicting each other or the Global Constraints, and anything the plan mandates that a reviewer would call a defect (a test asserting nothing, a duplicated logic block). Settle each against the spec: where the spec decides it, the spec governs — record `pre-flight: <conflict> — ruling: <which governs, why>` in the ledger and carry on. Ask only about conflicts the spec doesn't settle and whose answer changes behaviour or scope, all in one message, each beside the plan text. Clean scan: proceed silently.
 
-## Tightly-coupled plans
+## Inline or dispatch
 
-If the plan's tasks are genuinely coupled — each depending on the previous task's in-flight state — work them inline in this session instead of dispatching. Same ledger, same commit per task, same test discipline. Fresh subagents fight each other on coupled work.
+Work the plan inline in this session when it has **five tasks or fewer**, or when its tasks are genuinely coupled — each depending on the previous task's in-flight state. Same ledger, same commit per task, same test discipline. Dispatch overhead (briefs, reports, a fresh context rebuilding the codebase per task) outweighs the context savings on small plans, and fresh subagents fight each other on coupled work.
 
 Everything below assumes the dispatching path.
 
@@ -70,8 +73,8 @@ Use the least capable model that can do the job, and **always name it explicitly
 - 1-2 files with a complete spec: cheap.
 - Multiple files, integration concerns: standard.
 - Design judgement or broad codebase understanding: most capable.
-- Reviewers: scale to the diff's size and risk. Scoped re-reviews of small fix diffs are cheap-to-mid.
-- Fix rounds 4-5: at least one tier above the implementer that got stuck.
+- High-risk task reviewers: standard. Scoped re-reviews of small fix diffs are cheap-to-mid.
+- Fix round 2: at least one tier above the implementer that got stuck.
 - Final whole-branch review: `/code-review high`, not a dispatched reviewer.
 
 Turn count beats token price. The cheapest models often take 2-3× the turns on multi-step work and cost more overall, so use mid-tier as the floor for reviewers and for implementers working from prose.
@@ -98,7 +101,7 @@ Template: `prompts/implementer.md`
 
 ### 2. Handle the report
 
-**DONE** — generate the review package and dispatch the reviewer.
+**DONE** — check the report lists the tests run, the command and the result, and that `git log --oneline BASE..HEAD` shows the commits. Then complete the task, or review it first if it is high-risk.
 
 **DONE_WITH_CONCERNS** — read the concerns. Correctness or scope: address before review. Observations: note and proceed.
 
@@ -108,9 +111,9 @@ Template: `prompts/implementer.md`
 
 Never ignore an escalation, and never make the same model retry unchanged. If the implementer said it's stuck, something has to change.
 
-### 3. Review the task
+### 3. Review high-risk tasks
 
-Both verdicts are required — spec compliance **and** code quality. Never skip the task review; the implementer's self-review doesn't replace it.
+Most tasks get no per-task review — the final whole-branch review covers them. Review a task on its own only when it touches auth, permissions or tenant isolation; data loss, migrations or schema change; secrets; or concurrency and ordering. For those, both verdicts are required — spec compliance **and** code quality.
 
 Run `scripts/review-package PLAN_FILE BASE HEAD` and pass the reviewer the path it prints. Use the BASE you recorded — **never `HEAD~1`**, which silently drops all but the last commit of a multi-commit task. **Never dispatch a reviewer without a diff file.**
 
@@ -133,23 +136,23 @@ Two things leave immediately:
 - **Minor findings** go to the ledger (`Task <N>: minor (deferred): <one-liner>`) and get pointed out to the final review. They never enter the loop.
 - **Plan-mandated findings** — anything conflicting with what the plan requires — get settled against the spec, as in the pre-flight scan. Where the spec decides, record the ruling in the ledger and act on it. Where it doesn't and the answer changes behaviour or scope, it's the user's call: present the finding beside the plan text and ask. Don't dismiss a finding because the plan mandates it.
 
-Everything else loops. One fix dispatch plus one scoped re-review is a round. **Five rounds maximum.**
+Everything else loops. One fix dispatch plus one scoped re-review is a round. **Two rounds maximum.**
 
-**Rounds 1-3:** resume the original implementer with the open findings verbatim. Its context is intact.
+**Round 1:** resume the original implementer with the open findings verbatim. Its context is intact.
 
-**Rounds 4-5:** fresh implementer, stronger model, framed as "a prior implementer attempted this [N] times; you own it now — read the report file for what was tried." Three failed resumes usually means it can't see its own problem.
+**Round 2:** fresh implementer, stronger model, framed as "a prior implementer attempted this; you own it now — read the report file for what was tried."
 
 Every round the implementer fixes, re-runs the tests covering the amended code, appends to the same report file, and returns the short contract. Confirm the fix report has the covering tests, the command, and the output before re-dispatching the reviewer.
 
 The re-review is **scoped**: `scripts/review-package PLAN_FILE FIX_BASE HEAD` where FIX_BASE is the head the last review saw. The re-reviewer verdicts each finding ADDRESSED or NOT ADDRESSED and flags new breakage in the fix diff only. New Critical/Important breakage joins the open list; out-of-scope observations go to the ledger as deferred minors and never extend the loop.
 
-Append after each round: `Task <N>: fix round <R>/5 (<X> addressed, <Y> open — <one-liners>; commits <a7>..<b7>)`
+Append after each round: `Task <N>: fix round <R>/2 (<X> addressed, <Y> open — <one-liners>; commits <a7>..<b7>)`
 
 **Never fix findings yourself in the controller session.** Controller fixes pollute your context and skip review entirely.
 
 Template: `prompts/re-review.md`
 
-**At the cap.** When round 5 still leaves findings open, stop dispatching and adjudicate each one — you hold the plan and cross-task context the reviewer lacks:
+**At the cap.** When round 2 still leaves findings open, stop dispatching and adjudicate each one — you hold the plan and cross-task context the reviewer lacks:
 
 - **Reviewer wrong, or contestable:** park it — `Task <N>: parked — <finding> — ruling: <why the code stands>`.
 - **Real, nothing downstream depends on it:** park it, ruling says real and deferred.
@@ -159,18 +162,19 @@ Template: `prompts/re-review.md`
 
 ### 5. Complete the task
 
-Review clean, or every finding parked with a ruling at the cap:
+Report checked, and for a high-risk task the review clean or every finding parked with a ruling at the cap:
 
+- `Task <N>: complete (commits <base7>..<head7>)`
 - `Task <N>: complete (commits <base7>..<head7>, review clean)`
 - `Task <N>: complete (commits <base7>..<head7>, <K> parked)`
 
-Confirm with `git diff` that the work exists — the implementer's report is not evidence. Then mark the todo done and move on.
+Confirm with `git log --oneline <base>..<head>` that the commits exist — the implementer's report is not evidence. Then mark the todo done and move on.
 
 Never advance while Critical or Important findings are neither fixed nor parked-with-ruling at the cap.
 
 ## Final review
 
-Run `/code-review high <branch>` — name the branch, since bare `/code-review` reviews the current uncommitted diff. It finds correctness bugs across task boundaries, which no single task review could see, and verifies each finding before reporting it.
+Run `/code-review high <branch>` — name the branch, since bare `/code-review` reviews the current uncommitted diff. It is the only review most tasks get, finds correctness bugs across task boundaries, and verifies each finding before reporting it.
 
 Then do the two checks it can't, since only you hold the plan and ledger:
 
@@ -191,4 +195,4 @@ Say plainly in the write-up that these were reviewed and left on purpose, so the
 
 Then delete this plan's workspace. Leave sibling plan directories alone.
 
-Then `workflow:finish`.
+Then tell the user the branch is ready and to run `/workflow:finish` to land it. Don't land it yourself.

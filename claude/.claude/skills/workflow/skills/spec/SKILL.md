@@ -1,13 +1,13 @@
 ---
 name: spec
-description: Use before any creative work - new features, components, functionality, or behaviour changes. Explores intent, constraints and design, and produces an approved design document.
+description: Use when the user asks for a spec, or before work that spans several subsystems or turns on a design decision the user should make. Explores intent, constraints and design, and produces an approved design document. Not for ordinary features, fixes or changes - build those directly.
 ---
 
 # Spec
 
 Turn an idea into an agreed design, then write it down.
 
-**No code, no scaffolding, no other skill until the design is approved.** The exception is small, unambiguous work — a few files, no new interface, nothing you'd have to ask: state the design in a line or two and build it. If writing that line turns up a choice or an assumption, it isn't small — do the full spec.
+**No code, no scaffolding, no other skill until the design is approved.**
 
 ## Steps
 
@@ -21,7 +21,7 @@ Create a todo per step.
 6. **Write it to `.dev/spec/YYYY-MM-DD-<topic>.md`.** That tree is gitignored — nothing here gets committed.
 7. **Self-review the file, fix inline:** placeholders and TBDs, sections that contradict each other, scope that needs splitting, requirements readable two ways.
 8. **Hand it over and wait** — this is the one stop: "Spec written to `<path>`. Approve, or tell me what to change." Lead with the assumptions and the approach choice, since those are what the review is for.
-9. **On approval, run `workflow:plan` then `workflow:implement` without stopping.**
+9. **On approval, run `workflow:plan`.**
 
 ## Architecture decisions
 

@@ -113,4 +113,4 @@ Run this yourself against the spec, then fix inline. No second pass.
 
 ## Handoff
 
-Save the plan, say where it is in one line, and go straight into `workflow:implement`. The plan is not a stop.
+Save the plan and stop: give its path, the task count, and whether `workflow:implement` will run it inline (five tasks or fewer, or coupled) or dispatch subagents. The user starts it with `/workflow:implement <path>`.

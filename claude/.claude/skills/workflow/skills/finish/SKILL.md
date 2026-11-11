@@ -1,6 +1,7 @@
 ---
 name: finish
 description: Use when implementation is complete and the work needs to land - merged, pushed as a PR, or left on its branch. Verifies tests, runs the review, then lands it - merging locally on its own, asking before anything is pushed.
+disable-model-invocation: true
 ---
 
 # Finish
