@@ -124,3 +124,19 @@ export PATH="$HOME/.local/bin:$PATH"
 # ---- dotnet ----
 export DOTNET_ROOT=$HOME/.dotnet
 export PATH=$HOME/.dotnet:$PATH
+
+# ---- pen.dev ----
+penopen() {
+  if (( $# == 0 )); then
+    echo "usage: penopen <file.pen>..." >&2
+    return 1
+  fi
+  local f
+  for f in "$@"; do
+    if [[ ! -f $f ]]; then
+      echo "penopen: not a file: $f" >&2
+      return 1
+    fi
+    /opt/pen-dev-appimage/pen-dev.AppImage --no-sandbox "${f:A}" >/dev/null 2>&1 &!
+  done
+}
