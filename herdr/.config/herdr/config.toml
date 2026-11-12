@@ -10,20 +10,28 @@ active_row_bg = "#3a3d52"
 
 [keys]
 prefix = "ctrl+s"
-toggle_sidebar = "ctrl+backtick"
-split_vertical = "shift+alt+d"
-split_horizontal = "shift+alt+s"
+toggle_sidebar = ["prefix+b", "ctrl+backtick"]
+split_vertical = ["prefix+v", "shift+alt+d"]
+split_horizontal = ["prefix+minus", "shift+alt+s"]
 close_pane = "prefix+x"
 cycle_pane_next = ["prefix+tab", "shift+alt+e"]
-previous_workspace = "shift+alt+k"
-next_workspace = "shift+alt+j"
-previous_agent = "shift+alt+q"
-next_agent = "shift+alt+a"
+previous_workspace = "shift+alt+u"
+next_workspace = "shift+alt+i"
+previous_agent = "shift+alt+j"
+next_agent = "shift+alt+k"
 switch_workspace = "prefix+shift+1..9"
 switch_tab = ["prefix+1..9", "shift+alt+1..9"]
-next_tab = ["prefix+n", "shift+alt+r"]
-previous_tab = ["prefix+p", "shift+alt+f"]
+next_tab = ["prefix+n", "shift+alt+m"]
+previous_tab = ["prefix+p", "shift+alt+n"]
 new_tab = ["prefix+c", "shift+alt+t"]
+resize_pane_left = "shift+alt+left"
+resize_pane_down = "shift+alt+down"
+resize_pane_up = "shift+alt+up"
+resize_pane_right = "shift+alt+right"
+swap_pane_left = "ctrl+shift+alt+left"
+swap_pane_down = "ctrl+shift+alt+down"
+swap_pane_up = "ctrl+shift+alt+up"
+swap_pane_right = "ctrl+shift+alt+right"
 
 # shift+alt+w closes the pane via a confirmation popup instead of the raw action
 [[keys.command]]
