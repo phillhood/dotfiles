@@ -38,13 +38,6 @@ export default function (pi: ExtensionAPI) {
 	pi.on("session_start", async (_event, ctx) => {
 		const projectTrusted = ctx.isProjectTrusted();
 
-		// Track thinking level from events
-		let thinkingLevel = "high";
-
-		pi.on("thinking_level_select", async (event) => {
-			thinkingLevel = event.level;
-		});
-
 		// Track tokens/sec for the most recent assistant response
 		let lastSpeed: number | null = null;
 		let assistantStartTime: number | null = null;
@@ -71,9 +64,13 @@ export default function (pi: ExtensionAPI) {
 
 		ctx.ui.setFooter((tui, theme, footerData) => {
 			const unsub = footerData.onBranchChange(() => tui.requestRender());
+			const unsubThinking = pi.on("thinking_level_select", () => tui.requestRender());
 
 			return {
-				dispose: unsub,
+				dispose() {
+					unsub();
+					unsubThinking();
+				},
 				invalidate() {},
 				render(width: number): string[] {
 					let input = 0,
@@ -134,6 +131,7 @@ export default function (pi: ExtensionAPI) {
 						icons.tools + " " + (toolsExpanded ? icons.on : icons.off),
 					);
 
+					const thinkingLevel = pi.getThinkingLevel();
 					// Thinking level dot colors — using valid tokens
 					const levelColors: Record<string, string> = {
 						off: "thinkingOff",
