@@ -4,3 +4,7 @@
 	name = Phill Hood
 [core]
 	sshCommand = ssh -i ~/.ssh/id_rsa_aethon -o IdentitiesOnly=yes
+[credential "https://dev.azure.com"]
+	helper =
+	helper = az-devops
+	useHttpPath = false
