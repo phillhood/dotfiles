@@ -46,6 +46,7 @@ status_indicators = "dots"
 row_gap = 1
 rows = [
   ["state_icon", { token = "workspace", fg = "#c6a0f6", bold = true }],
+  [{ token = "$worktree", fg = "#8bd5ca" }],
   [{ token = "terminal_title_stripped", fg = "#cad3f5" }],
   [{ token = "agent", dim = true }],
 ]
