@@ -6,6 +6,9 @@ background-blur-radius = 20
 cursor-style = bar
 cursor-style-blink = true
 minimum-contrast = 3
+window-padding-x = 4
+window-padding-y = 4
+window-padding-balance = true
 
 # Options
 shell-integration-features = ssh-terminfo
