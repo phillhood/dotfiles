@@ -68,6 +68,8 @@ command -v starship >/dev/null && eval "$(starship init zsh)"
 _prompt_spacer() { (( _prompt_drawn++ )) && print }
 autoload -Uz add-zsh-hook && add-zsh-hook precmd _prompt_spacer
 clear() { command clear "$@"; _prompt_drawn=0 }
+_cursor_bar() { print -n '\e[5 q' }
+add-zsh-hook precmd _cursor_bar
 
 # ---- Shell integrations ----
 command -v fnm >/dev/null && eval "$(fnm env --use-on-cd --shell zsh)"
