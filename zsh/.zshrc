@@ -64,6 +64,9 @@ bindkey '^n' history-search-forward
 
 # ---- Prompt ----
 command -v starship >/dev/null && eval "$(starship init zsh)"
+_prompt_spacer() { (( _prompt_drawn++ )) && print }
+autoload -Uz add-zsh-hook && add-zsh-hook precmd _prompt_spacer
+clear() { command clear "$@"; _prompt_drawn=0 }
 
 # ---- Shell integrations ----
 command -v fnm >/dev/null && eval "$(fnm env --use-on-cd --shell zsh)"
