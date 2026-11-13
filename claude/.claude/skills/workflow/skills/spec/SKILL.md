@@ -14,14 +14,14 @@ Turn an idea into an agreed design, then write it down.
 Create a todo per step.
 
 1. **Read the project first.** Files, README, recent commits.
-2. **Check the scope.** If the request covers several independent subsystems, say so before spending questions on detail. Decompose, then spec the first piece. Each piece gets its own spec → plan → implementation cycle.
+2. **Check the scope.** If the request covers several independent subsystems, say so before spending questions on detail. Decompose, then spec the first piece. Each piece gets its own spec.
 3. **Ask only what you can't infer, all in one message.** Purpose, constraints, success criteria — and only where the answer changes the design. Each question carries your recommended answer. Multiple choice where it fits. Nothing to ask: skip this step.
 4. **Choose an approach.** Where 2-3 are genuinely viable, the spec lists them with trade-offs, your pick and why. Cut anything YAGNI.
 5. **Write the design**, each section scaled to its complexity — a sentence where it's obvious, a few hundred words where it isn't. Cover architecture, components, data flow, error handling, testing. Mark every assumption you made instead of asking.
-6. **Write it to `.dev/spec/YYYY-MM-DD-<topic>.md`.** That tree is gitignored — nothing here gets committed.
+6. **Write it to `.dev/spec/YYYY-MM-DD-<topic>.md`.**
 7. **Self-review the file, fix inline:** placeholders and TBDs, sections that contradict each other, scope that needs splitting, requirements readable two ways.
 8. **Hand it over and wait** — this is the one stop: "Spec written to `<path>`. Approve, or tell me what to change." Lead with the assumptions and the approach choice, since those are what the review is for.
-9. **On approval, run `workflow:plan`.**
+9. **On approval, build it.**
 
 ## Architecture decisions
 
@@ -31,7 +31,7 @@ Offer an ADR only when all three hold:
 2. **Surprising without context** — a future reader will ask "why this way?"
 3. **A real trade-off** — genuine alternatives existed and you picked one for stated reasons.
 
-Any one missing, skip it — the decision belongs in the spec, not its own record. Records go to `.docs/adr/NNNN-<slug>.md`: the decision, the alternatives, why this one, and what it costs.
+Any one missing, skip it — the decision belongs in the spec, not its own record. Records go to `adr/NNNN-<slug>.md` under the repo's docs (`docs/` if it has none): the decision, the alternatives, why this one, and what it costs.
 
 ## Designing units
 
@@ -43,7 +43,7 @@ Prefer small focused files. A file that has grown large is usually doing too muc
 
 ## New projects
 
-A greenfield repo has no conventions to match, so whatever the first few files do becomes the convention by accident. Settle the ones that bind every later task before planning, and record them in the spec — they become the plan's Global Constraints, which every task and every reviewer inherits.
+A greenfield repo has no conventions to match, so whatever the first few files do becomes the convention by accident. Settle the ones that bind every later task before building, and record them in the spec as constraints every task and reviewer inherits.
 
 Ask about them together, once, rather than as each comes up:
 

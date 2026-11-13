@@ -4,13 +4,10 @@
 - Model the message on the most recent handful of commits in that repo. Where a repo's history uses ticket IDs (`CORE-155 ...`) or prefixes (`fix(console): ...`), match the history.
 
 # Project docs
-- **A committed `docs/` wins.** If the project specifies that documentation belongs in the repo, or a top-level `docs/` already exists, write there — docs are part of that repo's committed surface. Otherwise use the local trees below, and never create a top-level `docs/` where none exists.
-- **`.docs/` — durable documentation.** Design notes, deploy guides, roadmaps, per-role and per-module reference, conventions, anything explaining *why*. Fold new notes into the existing `.docs/` file that owns the topic rather than adding a new dated file.
-- **`.dev/` — skill and workflow output.** The workflow runs spec → plan → implementation, one directory each (`.dev/spec/`, `.dev/plan/`, `.dev/implementation/`), plus handoffs, scratch scripts and generated or backup output. Delete these once the work lands; anything durable gets folded into `.docs/` first.
-- `.docs/` and `.dev/` are local-only and must stay out of git. Both are already in `~/.gitignore_global`; also add them to the repo's own `.gitignore` so the rule survives a clone, and to `.dockerignore` where one exists.
-- **Ignore them as `.docs` and `.dev`, without a trailing slash.** In a git worktree both trees are symlinks back to the main checkout (a worktree checks out tracked files only, so the real directories aren't there). A trailing slash matches directories only, and a symlink-to-a-directory isn't one — `.dev/` leaves the symlink showing as untracked in every worktree.
-- `.docs/` is gitignored, so nothing in it survives a clone. Treat it as load-bearing local state and keep it in a backup rotation.
-- **A repo that tracks `.docs` has overridden this on purpose.** A `!.docs` negation in the repo's own `.gitignore` is a deliberate call — usually so the docs are reachable from another machine — not an oversight. Leave it, keep writing there, and commit changes to it like any other tracked file; the two rules above stop applying to that repo, since it survives a clone and git is its backup. This changes nothing by default: `.docs` stays ignored everywhere the choice has not been made explicitly, and `.dev` stays ignored regardless.
+- **Durable documentation goes where the repo already keeps docs** — `docs/`, a wiki directory, or the README. Design notes, deploy guides, roadmaps, conventions, anything explaining *why*. Fold new notes into the file that owns the topic rather than adding a new dated file. Where the repo has no docs location, create `docs/`.
+- **`.dev/` holds working artifacts** — specs, plans, implementation ledgers, handoffs. It is committed like any other file. When the work lands, fold anything durable into the docs and delete that work's `.dev/` files as part of landing it.
+- Scratch scripts and generated or backup output don't go in `.dev/`; use the session scratchpad.
+- **A repo that ignores `.dev` in its own `.gitignore` has opted out on purpose.** Keep writing there, but never commit it.
 - `README.md` stays at the repo root.
 
 # Recommendations
@@ -43,7 +40,7 @@
 - `grep` on this machine is **ripgrep**, not GNU grep. Adjust flags accordingly.
   - Patterns are regex by default — **never pass `-E`**. In rg, `-E` means `--encoding` and fails with `unknown encoding: <your pattern>`.
   - Use `-F` for a literal string, `-P` for PCRE2 (lookaround, backreferences).
-  - rg is recursive by default and skips `.gitignore`d and hidden files. Use `-u` to include ignored, `-uu` for ignored + hidden. This matters when searching `.docs/`, `.dev/`, `.env`, or anything else gitignored.
+  - rg is recursive by default and skips `.gitignore`d and hidden files. Use `-u` to include ignored, `-uu` for ignored + hidden. This matters when searching `.env`, a repo-ignored `.dev/`, or anything else gitignored.
   - An empty result over a hidden or gitignored tree is a **tooling failure until proven otherwise**, not an absence — rg returns zero matches, not an error. Before concluding something isn't there, search for a string you know is present.
   - Don't combine `-l` and `-c` in one invocation; it produces empty output rather than a complaint.
   - `grep -r pat .` → `rg pat`. `--include=GLOB` → `-g GLOB`. `-l/-c/-o/-i/-v/-w/-n/-A/-B/-C` all behave the same.
@@ -56,7 +53,10 @@
   - Long `;`/`&&` chains that mix `cd`, `mktemp`, subshells and `$(...)`.
   - When one gets refused, split it into separate plain Bash calls with literal arguments. Don't retry the same shape.
 
-# Multi-agent workflow
+# Autonomy
+- Keep moving. Stop only for a major decision (hard to reverse, visible outside this machine, or a real trade-off in scope or design), uncertainty the code, history or docs can't resolve, or a blocker.
+- Everything else: pick the reasonable option, note it, and continue. When you do stop, put every open question in one message.
+
+# Codex
 - Codex is your senior coding teammate: use Codex by asking for help or opinions as you work through difficult problems and need to consult another resource
 - `/codex:rescue` — investigations, bugs, and explicit fix requests.
-- Review happens when work lands — `workflow:finish` picks the reviewer. Findings from any reviewer go through `workflow:review-response`.

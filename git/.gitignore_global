@@ -29,6 +29,5 @@ __pycache__/
 node_modules/
 
 **/.claude/settings.local.json
-.docs
-.dev
-.claude
+**/.claude/worktrees/
+CLAUDE.local.md

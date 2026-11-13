@@ -6,25 +6,10 @@ This bundle derives from two MIT-licensed projects.
 
 <https://github.com/obra/superpowers>
 
-**Included verbatim:**
-
-- `skills/implement/prompts/implementer.md`
-- `skills/implement/prompts/task-reviewer.md`
-- `skills/implement/prompts/re-review.md`
-- `skills/debug/references/root-cause-tracing.md`
-- `skills/debug/references/defense-in-depth.md`
-- `skills/debug/references/condition-based-waiting.md`
-- `skills/debug/references/condition-based-waiting-example.ts`
-
 **Derived, with modifications:**
 
-- `skills/implement/scripts/workspace` (from `sdd-workspace`), `task-brief`, `review-package` — retargeted to `.dev/implementation/`
 - `skills/spec/SKILL.md` (from `brainstorming`)
-- `skills/plan/SKILL.md` (from `writing-plans`)
-- `skills/implement/SKILL.md` (from `subagent-driven-development`, absorbing `executing-plans` and `using-git-worktrees`)
-- `skills/debug/SKILL.md` (from `systematic-debugging`)
-- `skills/review-response/SKILL.md` (from `receiving-code-review`)
-- `skills/finish/SKILL.md` (from `finishing-a-development-branch`)
+- `skills/finish/SKILL.md` (from `finishing-a-development-branch`, absorbing `receiving-code-review`)
 
 ## mattpocock/skills — Matt Pocock
 

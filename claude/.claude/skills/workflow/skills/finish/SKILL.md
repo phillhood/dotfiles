@@ -37,9 +37,7 @@ Review the branch against the base before it lands. Pick one by what the change 
 | Non-trivial — new behaviour, several files, a public interface | `/codex:review --base <base> --wait` |
 | Auth, permissions, tenant isolation, data loss, migrations, schema, rollback, retries, idempotency, concurrency, ordering | `/codex:adversarial-review --base <base> --wait` |
 
-Coming from `workflow:implement`, its final review already covered the branch — skip this step unless the change hits the last row and the final review wasn't adversarial.
-
-Findings go through `workflow:review-response`. Fixes re-run the suite before landing.
+Verify each finding against the code before acting on it — a reviewer working from a diff can't see what surrounds it. Adversarial findings carry confidence scores; verify either way. Fixes re-run the suite before landing.
 
 ## 5. Land it
 
@@ -62,6 +60,8 @@ Implementation complete and reviewed. Push and open a PR, or keep the branch as-
 
 Never push, open a PR, or delete a remote branch without that answer.
 
+**Clear `.dev` before it lands.** Fold anything durable from this work's spec and handoff into the repo's docs, then delete those files in one commit on the branch. Leave sibling work's files alone. Skip this in a repo that ignores `.dev`.
+
 **Merge before removing anything.** Merge, confirm it succeeded, re-run the suite on the merged result, and only then tear down the workspace. A clean merge that breaks on integration is still a broken merge.
 
 Commit and PR text follows the repo's conventions — model it on the recent history, including whether it uses prefixes. No `Co-Authored-By` trailer.
@@ -76,7 +76,7 @@ If `GIT_DIR` equals `GIT_COMMON`, it's a normal checkout — nothing to clean up
 
 If the session entered a worktree via `EnterWorktree`, use `ExitWorktree`. Otherwise the host environment owns the workspace: leave it alone.
 
-The `.dev/implementation/<plan>/` artifacts go once the work is merged — git history is the record now. Leave sibling plan directories alone.
+In a repo that ignores `.dev`, delete this work's `.dev` files locally now. Leave sibling work's files alone.
 
 ## Discarding
 

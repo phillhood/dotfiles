@@ -9,7 +9,7 @@ Write the document the next reader opens first. Assume they have none of this se
 
 Write one when work crosses a boundary — a new session tomorrow, a different repo, a handover to Codex or to a person. **Not** for mid-task context pressure: compaction carries that, and stopping early to hand off wastes the run.
 
-Save to `.dev/handoff/YYYY-MM-DD-<topic>.md`. That tree is gitignored, so the next session reads it off the local checkout — a handoff never travels in a commit or a PR.
+Save to `.dev/handoff/YYYY-MM-DD-<topic>.md`. Commit it, so the next session finds it on any machine. In a repo that ignores `.dev`, it stays on this checkout only.
 
 ## Sections
 
@@ -34,8 +34,7 @@ Drop any that would be empty. Keep the order — it's the order the reader needs
 ## What goes somewhere else
 
 - **A durable fact that outlives this effort** — a tool's quirk, a machine's config, a preference — belongs in memory. Write it there and link it from the handoff as `[[memory-name]]`. Don't inline it.
-- **Anything explaining why the system is the way it is** — architecture, conventions, deploy procedure — goes in `.docs/`, folded into the file that owns the topic.
-- **Per-task progress inside a running plan** belongs in the implementation ledger, not here. The handoff points at the ledger; it doesn't duplicate it.
+- **Anything explaining why the system is the way it is** — architecture, conventions, deploy procedure — goes in the repo's docs, folded into the file that owns the topic.
 
 A handoff carries orientation for *this* effort. Everything durable should have already moved out of it.
 
@@ -43,4 +42,4 @@ A handoff carries orientation for *this* effort. Everything durable should have 
 
 Keep it under about 150 lines. A handoff nobody finishes reading has failed at its only job.
 
-If it's growing past that, the excess is usually durable content that belongs in `.docs/` or memory — move it rather than trimming detail out of the traps.
+If it's growing past that, the excess is usually durable content that belongs in the repo's docs or memory — move it rather than trimming detail out of the traps.
