@@ -95,10 +95,16 @@
       "keyColor": "32"
     },
     {
-      "type": "display",
+      "type": "command",
       "key": "     󰹑 Display ",
       "keyColor": "36",
-      "format": "{width}x{height} @ {refresh-rate} Hz"
+      "text": "hyprctl monitors -j | jq -r 'sort_by(.name) | .[0] // empty | (if .transform % 2 == 1 then \"\\(.height)x\\(.width)\" else \"\\(.width)x\\(.height)\" end) + \" @ \\(.refreshRate | round) Hz\"'"
+    },
+    {
+      "type": "command",
+      "key": "     󰹑 Display ",
+      "keyColor": "36",
+      "text": "hyprctl monitors -j | jq -r 'sort_by(.name) | .[1] // empty | (if .transform % 2 == 1 then \"\\(.height)x\\(.width)\" else \"\\(.width)x\\(.height)\" end) + \" @ \\(.refreshRate | round) Hz\"'"
     },
     {
       "type": "command",
