@@ -1,3 +1,5 @@
+<img src="assets/logo.svg" alt="" width="96" align="right">
+
 # dotfiles
 
 Personal dotfiles for Arch Linux (Hyprland/Wayland) and macOS, managed with
