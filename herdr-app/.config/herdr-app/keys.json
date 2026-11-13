@@ -21,6 +21,7 @@
     "ctrl-alt-shift-right": "pane.swap:right",
     "alt-shift-d": "pane.split:right",
     "alt-shift-s": "pane.split:down",
+    "alt-shift-w": "mod.open:close-pane-confirm",
     "alt-shift-u": "space.prev",
     "alt-shift-i": "space.next",
     "alt-shift-j": "agent.prev",
