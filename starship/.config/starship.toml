@@ -4,11 +4,8 @@ palette = "catppuccin_mocha"
 add_newline = false
 
 format = """
-╭─$os$directory$git_branch$git_status$fill$nodejs$python$cmd_duration$time
+╭─$os$directory$git_branch$git_status
 ╰─$character"""
-
-[fill]
-symbol = " "
 
 [character]
 success_symbol = "[❯](fg:green)"
@@ -50,27 +47,6 @@ untracked   = "[  ${count}](red)"
 conflicted  = "[ =${count}](red)"
 stashed     = "[  ${count}](overlay1)"
 up_to_date  = ""
-
-[nodejs]
-format = "[$symbol$version ]($style)"
-symbol = " "
-style = "fg:peach"
-
-[python]
-format = "[$symbol$virtualenv ]($style)"
-symbol = " "
-style = "fg:green"
-
-[cmd_duration]
-format = "[$duration ]($style)"
-style = "fg:overlay1"
-min_time = 500
-
-[time]
-disabled = false
-format = "[$time ]($style)"
-style = "fg:teal"
-time_format = "%-I:%M%p"
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
