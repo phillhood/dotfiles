@@ -2,7 +2,7 @@
 # Region snip, Windows Snipping Tool style (bound to Super+Shift+S).
 #   1. slurp region selection
 #   2. grim captures it, copied to clipboard immediately
-#   3. opens in swappy for editing; Ctrl+C re-copies edits, Ctrl+S saves
+#   3. with --edit (Ctrl+Super+Shift+S), opens in swappy; Ctrl+C re-copies edits, Ctrl+S saves
 #
 # Gaming-aware: a true-fullscreen window (e.g. WoW) renders on top of floating
 # windows, so swappy would be hidden behind the game. When something is
@@ -16,7 +16,9 @@ trap 'rm -f "$tmp" "$full"; [ -n "$picker" ] && kill "$picker" 2>/dev/null' EXIT
 
 # Must run before slurp: slurp takes pointer focus and transient tooltips close.
 grim -t ppm "$full" || exit 0
-if command -v hyprpicker >/dev/null; then
+# hyprpicker -z ignores output transform and stretches rotated monitors.
+if command -v hyprpicker >/dev/null &&
+    hyprctl monitors -j | jq -e 'all(.transform == 0)' >/dev/null; then
     hyprpicker -r -z -d >/dev/null 2>&1 &
     picker=$!
     # slurp must map after hyprpicker or the frozen frame covers it.
@@ -45,6 +47,7 @@ fi
 
 # Initial clip straight to the clipboard (wl-copy buffers it in memory).
 wl-copy --type image/png < "$tmp"
+[ "$1" = "--edit" ] || exit 0
 
 # If anything is fullscreen, pick a monitor that isn't hosting it for the editor.
 target_mon=""

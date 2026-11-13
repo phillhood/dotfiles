@@ -295,6 +295,7 @@ hl.bind(mod .. " + P", hl.dsp.layout("togglesplit"))
 hl.bind("Print", hl.dsp.exec_cmd("hyprshot -m output"))
 hl.bind(mod .. " + Print", hl.dsp.exec_cmd("hyprshot -m region"))
 hl.bind(mod2 .. " + S", hl.dsp.exec_cmd("/home/phill/.config/hypr/scripts/snip.sh"))
+hl.bind("CTRL + " .. mod2 .. " + S", hl.dsp.exec_cmd("/home/phill/.config/hypr/scripts/snip.sh --edit"))
 
 -- Mouse window management
 hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
