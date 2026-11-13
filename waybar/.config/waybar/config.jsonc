@@ -1,7 +1,4 @@
-{/* >>> herdr-watchr >>> */
-  "include": ["/home/phill/.config/waybar/herdr-watchr.jsonc"],
-  /* <<< herdr-watchr <<< */
-
+{
   // ===== (a) bar settings =====
   "exclusive": true,
   "reload_style_on_change": true,
@@ -16,8 +13,7 @@
     "group/media-box",
     "group/cava-box"
   ],
-  "modules-center": [/* >>> herdr-watchr group >>> */"group/herdr-watchr"/* <<< herdr-watchr group <<< */
-  ],
+  "modules-center": [],
   "modules-right": [
     "group/tray-box",
     "group/system-box",

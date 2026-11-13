@@ -65,5 +65,3 @@ Open follow-ups for the stow-based dotfiles.
       `herdr/.config/herdr/config.toml` `command = /home/phill/.local/bin/herdr-confirm-close-pane`.
       Neither tool is known to support an include or `$HOME` expansion — check before choosing between
       a per-OS package and an env-var indirection.
-- [ ] `herdr-watchr` sits in `COMMON_PACKAGES` but its `waybar` block shells out to `hyprctl`, which
-      only exists under Hyprland. Decide whether the package belongs in `LINUX_PACKAGES`.
