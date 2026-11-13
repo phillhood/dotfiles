@@ -9,20 +9,36 @@ shellbench() {
 
 # Get escaped unicode sequence for an emoji and copy to clipboard
 emocode() {
-  local output=$(python -X utf8 -c 'import json, sys; s = json.dumps(sys.argv[1]); print(s[1:-1])' "$1")
-  case "$(uname)" in
-    Darwin)
-      printf "%s" $output | pbcopy
-      ;;
-    Linux)
-      printf "%s" $output | xclip -sel clipboard
-      ;;
-  esac
-}
-
-# Export all vars in a .env file to the current shell
-exportenv() {
-  if [ -f .env ]; then
-    export $(cat .env | xargs)
+  emulate -L zsh
+  (( $# == 1 )) || { print -u2 'usage: emocode <text>'; return 1 }
+  local c out=''
+  integer n
+  for c in ${(s::)1}; do
+    n=$(( #c ))
+    case $c in
+      '"') out+='\"' ;;
+      '\') out+='\\' ;;
+      $'\n') out+='\n' ;;
+      $'\r') out+='\r' ;;
+      $'\t') out+='\t' ;;
+      $'\b') out+='\b' ;;
+      $'\f') out+='\f' ;;
+      *)
+        if (( n >= 0x10000 )); then
+          n=$(( n - 0x10000 ))
+          out+=$(printf '\\u%04x\\u%04x' $(( 0xD800 + (n >> 10) )) $(( 0xDC00 + (n & 0x3FF) )))
+        elif (( n < 0x20 || n >= 0x7f )); then
+          out+=$(printf '\\u%04x' $n)
+        else
+          out+=$c
+        fi
+        ;;
+    esac
+  done
+  print -r -- $out
+  if [[ $OSTYPE == darwin* ]]; then
+    print -rn -- $out | pbcopy
+  else
+    print -rn -- $out | wl-copy
   fi
 }

@@ -10,44 +10,32 @@ dockstats() {
     (echo "$HEADER" && echo "$DATA")'
 }
 
-# Color-coded docker logs for all containers, with a custom prefix to share colors between similarly named containers
-# Usage: alllogs [prefix]
+# Color-coded logs for all running containers. Replicas (web-1, web-2) share a
+# colour; with a prefix, every container whose name starts with it shares one.
+# Usage: docklogs [prefix]
 docklogs() {
-  local pids=()
-  local colors=("31" "32" "33" "34" "35" "36" "37" "91" "92" "93" "94" "95" "96")
-  local color_map=()
-  local color_index=0
-  local pattern="${1:-default}"
-  
-  for container in $(docker ps --format "{{.Names}}"); do
-    local prefix
-    if [[ "$pattern" == "default" ]]; then
-      prefix=$(echo $container | sed -E 's/^([^-]+(-[^-]+)*).*/\1/')
+  emulate -L zsh
+  local pattern=$1 container group esc=$'\e'
+  local -a colors=(31 32 33 34 35 36 37 91 92 93 94 95 96) pids
+  local -A color_of
+  local next=1
+
+  for container in ${(f)"$(docker ps --format '{{.Names}}')"}; do
+    if [[ -n $pattern && $container == ${pattern}* ]]; then
+      group=$pattern
     else
-      prefix=$(echo $container | grep -o -E "^$pattern[^$pattern]*" || echo $container)
+      group=${container%[-_]<->}
     fi
-    
-    local color=""
-    for i in "${!color_map[@]}"; do
-      if [[ "${color_map[$i]}" == "$prefix" ]]; then
-        color="${colors[$i]}"
-        break
-      fi
-    done
-    
-    if [[ -z "$color" ]]; then
-      color="${colors[$color_index]}"
-      color_map[$color_index]="$prefix"
-      ((color_index = (color_index + 1) % ${#colors[@]}))
+    if (( ! ${+color_of[$group]} )); then
+      color_of[$group]=${colors[next]}
+      next=$(( next % $#colors + 1 ))
     fi
-    
-    docker logs -f $container | 
-      sed -e "s/^/\x1b[${color}m${container}\x1b[0m --- /" &
-    
+    docker logs -f $container 2>&1 |
+      sed "s/^/${esc}[${color_of[$group]}m${container}${esc}[0m --- /" &
     pids+=($!)
-    echo ""
   done
-  
-  trap "kill ${pids[*]} 2>/dev/null" SIGINT SIGTERM
+
+  (( $#pids )) || { print -u2 'docklogs: no running containers'; return 1 }
+  trap "kill $pids 2>/dev/null" INT TERM
   wait
 }
