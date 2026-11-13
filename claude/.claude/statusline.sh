@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude Code statusline:  model │ context │ 5h usage │ week usage
+# Claude Code statusline:  model · effort │ context │ 5h usage │ week usage
 #
 # Claude Code pipes its statusline JSON payload on stdin; whatever this prints
 # to stdout becomes the line. Every value comes from that payload — no network
@@ -83,7 +83,8 @@ fields=$(jq -r '
     (.rate_limits.five_hour.used_percentage  | pct),
     (.rate_limits.five_hour.resets_at       // "-"),
     (.rate_limits.seven_day.used_percentage  | pct),
-    (.rate_limits.seven_day.resets_at       // "-") ]
+    (.rate_limits.seven_day.resets_at       // "-"),
+    (.effort.level                          // "-") ]
   | .[] | tostring
 ' <<<"$payload" 2>/dev/null) || bail
 
@@ -93,6 +94,7 @@ mapfile -t F <<<"$fields"
 model=${F[0]:-?}   ctx_pct=${F[1]:-0}   ctx_tok=${F[2]:-0}
 h5_pct=${F[3]:--}  h5_reset=${F[4]:--}
 wk_pct=${F[5]:--}  wk_reset=${F[6]:--}
+effort=${F[7]:--}
 
 # 812 -> 812 | 69783 -> 69.8k | 1234567 -> 1.2M   (half-up on the tenth)
 fmt_tokens() {
@@ -162,7 +164,8 @@ seg() {
   SEGMENTS+=("$out")
 }
 
-seg "$COLOR_MODEL"   "$ICON_MODEL"   "$model" '' ''
+[[ $effort == - ]] && effort=''
+seg "$COLOR_MODEL"   "$ICON_MODEL"   "$model" '' "$effort"
 seg "$COLOR_CONTEXT" "$ICON_CONTEXT" ''       "$ctx_pct" "$(fmt_tokens "$ctx_tok")"
 
 # Omitted rather than faked when Claude Code hasn't fetched limits (API-key
