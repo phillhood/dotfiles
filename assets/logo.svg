@@ -1,21 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="11 19 98 98" width="128" height="128">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="128" height="128">
   <title>dotfiles</title>
   <defs>
-    <linearGradient id="dot" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f5bde6"/>
-      <stop offset="1" stop-color="#c6a0f6"/>
+    <linearGradient id="ink" gradientUnits="userSpaceOnUse" x1="0" y1="10" x2="0" y2="62">
+      <stop offset="0" stop-color="#a48cfa"/>
+      <stop offset="0.5" stop-color="#6e77eb"/>
+      <stop offset="1" stop-color="#29a0db"/>
     </linearGradient>
-    <mask id="cut" maskUnits="userSpaceOnUse" x="11" y="19" width="98" height="98">
-      <rect x="11" y="19" width="98" height="98" fill="#fff"/>
-      <circle cx="40" cy="98" r="17" fill="#000"/>
-    </mask>
   </defs>
-  <g mask="url(#cut)" fill="none" stroke-width="6" stroke-linejoin="round">
-    <path d="M44 24h30l20 20v54a6 6 0 0 1-6 6H44a6 6 0 0 1-6-6V30a6 6 0 0 1 6-6z" stroke="#cad3f5"/>
-    <path d="M74 24v14a6 6 0 0 0 6 6h14" stroke="#cad3f5"/>
-    <path d="M50 56l8 7-8 7" stroke="#a6da95" stroke-width="5" stroke-linecap="round"/>
-    <path d="M64 70h16" stroke="#8aadf4" stroke-width="5" stroke-linecap="round"/>
-    <path d="M64 84h10" stroke="#6e738d" stroke-width="5" stroke-linecap="round"/>
+  <g fill="none" stroke="url(#ink)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 15l23 21-23 21"/>
+    <path d="M42 57h20"/>
   </g>
-  <circle cx="40" cy="98" r="12" fill="url(#dot)"/>
 </svg>
