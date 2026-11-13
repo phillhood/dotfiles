@@ -62,7 +62,8 @@ silently doing nothing.
 
 Repo-only (not stowed): `tools/` — terminal colour-scheme tooling in `tools/terminals/`, plus
 `tools/canonical/` (reference configs a tool rewrites live — `.claude/settings.json` and
-`.ssh/config` — applied by `bootstrap`, not stow).
+`.ssh/config` — applied by `bootstrap`, not stow). `docs/arch/` holds notes on the Arch desktop
+packages (Hyprland, waybar, swaync).
 
 ### ~/.ssh/config is deliberately not stowed
 

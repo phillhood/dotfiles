@@ -34,7 +34,6 @@ herdr/.config/herdr/*.bak*
 *.bak
 
 # ---- Session artifacts: per-session planning/implementation docs, never track ----
-# No trailing slash: in a git worktree both are symlinks back to the main checkout,
+# No trailing slash: in a git worktree it is a symlink back to the main checkout,
 # and a directory-only rule leaves the symlink showing as untracked.
 .dev
-.docs
