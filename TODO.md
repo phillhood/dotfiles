@@ -2,13 +2,6 @@
 
 Open follow-ups for the stow-based dotfiles.
 
-## Neovim
-- [ ] Decide nvim config: Arch runs a stock LazyVim (`~/.config/nvim` is still a real dir — untouched
-      starter, empty `extras`, unmodified `example.lua`); old EndeavourOS ran NvChad.
-- [ ] Once decided, add an `nvim/` stow package (`nvim/.config/nvim/…`); track `lazy-lock.json` and
-      `lua/plugins/` — that's config, not plugin code. lazy.nvim installs plugins to
-      `~/.local/share/nvim/lazy`, outside the package, so there is nothing to ignore.
-
 ## Hyprland desktop rice
 - [x] Track the core rice as stow packages — hypr, waybar, walker, ghostty, cava, fastfetch, btop are
       all packages and in `Makefile` `PACKAGES` (`575be02`).
@@ -29,9 +22,9 @@ Open follow-ups for the stow-based dotfiles.
 - [ ] **Arch, one-time:** `~/.ssh/config` there is still a symlink to the deleted `ssh/.ssh/config`, so
       it dangles once this is pulled. Run `make ssh-config` (or `make install`) on that box — it detects
       the dangling link and swaps in the skeleton. Until then every ssh host there stops resolving.
-- [ ] `~/.gitconfig` `includeIf` blocks point at `~/.ssh/id_shy` and `~/.ssh/id_ctrl`; neither key is on
-      the mac, so a commit under those identities fails there. Decide whether to install them or scope
-      the includes per-OS.
+- [ ] `~/.gitconfig` `includeIf` blocks pull in `~/.gitconfig-shy` (`~/.ssh/id_shy`) and
+      `~/.gitconfig-aethon` (`~/.ssh/id_rsa_aethon`). Check which keys the mac has; a push under a
+      missing identity fails there. Decide whether to install them or scope the includes per-OS.
 
 ## Claude Code (~/.claude)
 - [x] `settings.json` untracked from the `claude` package (Claude Code rewrites it live) — canonical

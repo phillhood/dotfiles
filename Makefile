@@ -46,8 +46,7 @@ stow: ## Stow (symlink) all packages
 unstow: ## Remove all symlinks
 	$(STOW) --delete $(PACKAGES)
 
-restow: ## Re-link all packages (after adding/renaming files)
-	$(STOW) --restow $(PACKAGES)
+restow: stow ## Re-link all packages (after adding/renaming files)
 
 adopt: ## One-time takeover of pre-existing real files as symlinks
 	$(STOW) --adopt $(PACKAGES)

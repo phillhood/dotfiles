@@ -16,19 +16,19 @@ config immediately — the deployed files are symlinks back into this repo.
 | ----------- | --------------------------------------------------------------- |
 | `zsh`       | `~/.zshrc`, `~/.hushlogin`, `~/.config/utils/*`                 |
 | `starship`  | `~/.config/starship.toml`                                       |
-| `git`       | `~/.gitconfig`, `~/.gitconfig-shy`, `~/.gitignore_global`       |
+| `git`       | `~/.gitconfig`, `~/.gitconfig-{shy,aethon}`, `~/.gitignore_global` |
 | `tmux`      | `~/.tmux.conf`                                                  |
 | `ssh`       | `~/.ssh/config.d/forge.conf`                                    |
 | `ssh-linux` | `~/.ssh/config.d/homelab.conf`                                  |
-| `claude`    | `~/.claude/CLAUDE.md`, `~/.claude/hooks/uv-python.sh`           |
+| `claude`    | `~/.claude/{CLAUDE.md,statusline.sh,hooks/*.sh,skills/workflow}` |
 | `pi`        | `~/.pi/agent/extensions/{status-line,context-command,title}.ts` |
 | `bat`       | `~/.config/bat/config`                                          |
 | `htop`      | `~/.config/htop/htoprc`                                         |
 | `k9s`       | `~/.config/k9s/*`                                               |
 | `helm`      | `~/.config/helm/repositories.yaml`                              |
-| `hypr`      | `~/.config/hypr/{hyprland.lua,hyprland-gui.lua,themes,scripts}` |
+| `hypr`      | `~/.config/hypr/{hyprland.lua,hyprland-gui.lua,hyprlock.conf,themes,scripts}`, `~/.local/share/applications/profile-browser.desktop` |
 | `waybar`    | `~/.config/waybar/{bars.jsonc,config.jsonc,style.css,*.sh}`     |
-| `swaync`    | `~/.config/swaync/{config.json,style.css,focus-app.sh}`         |
+| `swaync`    | `~/.config/swaync/{config.json,style.css,notify-profile.py}`    |
 | `walker`    | `~/.config/walker/*`                                            |
 | `ghostty`   | `~/.config/ghostty/config`                                      |
 | `ghostty-darwin` / `ghostty-linux` | `~/.config/ghostty/os.conf` (per-OS overlay)    |

@@ -1,7 +1,6 @@
 # ~/.zshrc — managed by stow (~/Dev/phillhood/dotfiles)
 
 # ---- PATH ----
-export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
@@ -19,6 +18,8 @@ else
 fi
 [ -r "$os_utils" ] && source "$os_utils"
 unset os_utils
+
+export PATH="$HOME/.local/bin:$PATH"
 
 # ---- zinit (plugin manager) ----
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
@@ -119,10 +120,6 @@ for file in $HOME/.config/utils/*(-.N); do
 done
 
 # ---- Installer wasteland ----
-
-# >>> Codex installer >>>
-export PATH="$HOME/.local/bin:$PATH"
-# <<< Codex installer <<<
 
 # ---- dotnet ----
 export DOTNET_ROOT=$HOME/.dotnet
