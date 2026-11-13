@@ -95,12 +95,21 @@
       "keyColor": "32"
     },
     {
+      "condition": { "system": "macOS" },
+      "type": "display",
+      "key": "     󰹑 Display ",
+      "keyColor": "36",
+      "format": "{width}x{height} @ {refresh-rate} Hz"
+    },
+    {
+      "condition": { "system": "Linux" },
       "type": "command",
       "key": "     󰹑 Display ",
       "keyColor": "36",
       "text": "hyprctl monitors -j | jq -r 'sort_by(.name) | .[0] // empty | (if .transform % 2 == 1 then \"\\(.height)x\\(.width)\" else \"\\(.width)x\\(.height)\" end) + \" @ \\(.refreshRate | round) Hz\"'"
     },
     {
+      "condition": { "system": "Linux" },
       "type": "command",
       "key": "     󰹑 Display ",
       "keyColor": "36",
