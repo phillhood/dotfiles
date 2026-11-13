@@ -36,6 +36,7 @@ config immediately — the deployed files are symlinks back into this repo.
 | `cava`      | `~/.config/cava/*`                                              |
 | `fastfetch` | `~/.config/fastfetch/*`                                         |
 | `herdr`     | `~/.config/herdr/config.toml`, `~/.local/bin/herdr-confirm-close-pane` |
+| `herdr-app` | `~/.config/herdr-app/{keys.json,settings.json,themes/*}`        |
 | `nvim`      | `~/.config/nvim/{init.lua,lua,lazy-lock.json,.stylua.toml}`      |
 
 `hypr/.config/hypr/plugins/`, `waybar/.config/waybar/backup/`, herdr's sockets/logs/session state, and
@@ -115,7 +116,7 @@ works. Port 2222 is LAN-only and not proxied to the WAN, so off-LAN needs the Ta
 ### Per-OS packages
 
 `Makefile` splits packages into `COMMON_PACKAGES`, `LINUX_PACKAGES` and `DARWIN_PACKAGES`, selected on
-`uname -s`. `hypr`, `waybar`, `walker`, `swaync`, `ghostty-linux` and `ssh-linux` are Linux-only;
+`uname -s`. `hypr`, `waybar`, `walker`, `swaync`, `ghostty-linux`, `ssh-linux` and `herdr-app` are Linux-only;
 `ghostty-darwin` is macOS-only; everything else is stowed on both. Adding a top-level package means adding it to whichever
 of the three lists it belongs in.
 
