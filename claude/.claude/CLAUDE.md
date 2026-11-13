@@ -57,6 +57,23 @@
 - Keep moving. Stop only for a major decision (hard to reverse, visible outside this machine, or a real trade-off in scope or design), uncertainty the code, history or docs can't resolve, or a blocker.
 - Everything else: pick the reasonable option, note it, and continue. When you do stop, put every open question in one message.
 
+# Dev flow
+Interim convention, set 2026-11-13; expect it to change.
+
+- **Stages and models, for standard and large tasks:**
+  1. Discuss, interview with `AskUserQuestion`, then write the spec — Fable, the main session.
+  2. Implement — Opus, as a subagent (`Agent` with `model: "opus"`).
+  3. Review — Fable, plus `/codex:adversarial-review`, run independently of each other.
+  4. Fix — Opus.
+- **Size the task first; the tier sets how much of the flow runs.** Say which tier you picked. When unsure between two, ask.
+  - **Trivial** — needs no design decision (a version bump, a rename, a one-line fix). Opus only, no Fable: no spec, no interview, no review round. In a Fable session, hand it to an Opus subagent with a short brief and check the diff it returns.
+  - **Standard** — a short spec with acceptance criteria written as checkable statements, then the full flow.
+  - **Large** — a full spec, then a breakdown into ordered pieces. Each piece is implemented, reviewed and fixed on its own, and loads the parent spec.
+- **The spec stands alone.** Opus sees none of the discussion, so the spec carries the acceptance criteria and the commands that prove the work. Write it to `.dev/spec/` and brief Opus from the file.
+- **Triage review findings before any fix.** Sort them into real and not real, and list the ones dropped with the reason.
+- **One fix round, then re-review the fix diff only.** If findings remain after that, stop and report them.
+- **Live and outward-facing steps stay in the main session.** Opus never pushes, applies or deploys. Rerun the proving commands yourself before calling the work done.
+
 # Codex
 - Codex is your senior coding teammate: use Codex by asking for help or opinions as you work through difficult problems and need to consult another resource
 - `/codex:rescue` — investigations, bugs, and explicit fix requests.
