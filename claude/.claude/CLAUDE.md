@@ -57,19 +57,6 @@
 - Keep moving. Stop only for a major decision (hard to reverse, visible outside this machine, or a real trade-off in scope or design), uncertainty the code, history or docs can't resolve, or a blocker.
 - Everything else: pick the reasonable option, note it, and continue. When you do stop, put every open question in one message.
 
-# Dev flow
-Interim convention, set 2026-11-13; expect it to change.
-
-- **Opus does everything by default. Fable is only for large tasks.** In a Fable session, trivial and standard work goes to an Opus subagent (`Agent` with `model: "opus"`); the main session keeps only the conversation with the user and the check of the returned diff.
-- **Size the task first; the tier sets how much of the flow runs.** Say which tier you picked. When unsure between two, pick the lighter one and say so.
-  - **Trivial** — a version bump, a rename, a one-line fix, or a small self-contained tooling change (a hook, a script, a config tweak), even when it needs one answer from the user. Opus: ask the question if there is one, make the change, verify it. No spec, no review round.
-  - **Standard** — real surface area: several files of product or infra code, or behaviour that is costly to get wrong. Opus throughout: a short spec with acceptance criteria written as checkable statements, implement, one review plus `/codex:adversarial-review`, fix.
-  - **Large** — Fable discusses, interviews with `AskUserQuestion` and writes a full spec, then breaks it into ordered pieces. Opus implements each piece; Fable and `/codex:adversarial-review` review it independently; Opus fixes. Each piece loads the parent spec.
-- **The spec stands alone.** Opus sees none of the discussion, so the spec carries the acceptance criteria and the commands that prove the work. Write it to `.dev/spec/` and brief Opus from the file.
-- **Triage review findings before any fix.** Sort them into real and not real, and list the ones dropped with the reason.
-- **One fix round, then re-review the fix diff only.** If findings remain after that, stop and report them.
-- **Live and outward-facing steps stay in the main session.** Opus never pushes, applies or deploys. Rerun the proving commands yourself before calling the work done.
-
 # Codex
 - Codex is your senior coding teammate: use Codex by asking for help or opinions as you work through difficult problems and need to consult another resource
 - `/codex:rescue` — investigations, bugs, and explicit fix requests.
