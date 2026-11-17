@@ -60,13 +60,11 @@ Open follow-ups for the stow-based dotfiles.
 ## Windows
 - [ ] Check the Windows Terminal canonical settings at the desk: PowerShell 7 is the default profile,
       there's no duplicate "PowerShell" entry, and `ctrl+w` closes a pane.
-- [ ] SSH keys on the work machine: `id_rsa_aethon` is there, `id_phill` isn't (nor `id_shy`, if that
-      identity is used there). The Windows agent holds no keys yet: `ssh-add` each one.
 - [x] git over SSH uses Windows OpenSSH, so the `ssh-agent` service holds each identity's passphrase:
       `core.sshCommand` runs `${DOTFILES_SSH:-ssh}`, set by `install.ps1` (`fff955d`). `install.ps1`
       has been re-run on the work machine, so `DOTFILES_SSH` is set and `~/.ssh` is locked down.
-- [ ] Once a key is in the agent, push twice from the work machine; the second push shouldn't prompt
-      for a passphrase.
+- [ ] On the work machine, `ssh-add $HOME\.ssh\id_rsa_aethon`, then push twice from a repo under
+      `~/Dev/aethon/`; the second push shouldn't prompt for a passphrase.
 - [ ] Optional: `pwsh-windows` startup is ~1.55s against a 0.36s baseline, mostly the starship, atuin
       and zoxide init evals. Caching their generated scripts as the uv completion already is
       (regenerated when the exe is newer) would save about 200ms.
