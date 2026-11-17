@@ -9,6 +9,7 @@ LINUX_PACKAGES := ssh-linux
 # (no compositor; the terminal runs on the Windows side).
 DESKTOP_PACKAGES := hypr waybar walker swaync ghostty-linux herdr-app
 DARWIN_PACKAGES := ghostty-darwin
+# Windows packages are linked by install.ps1, which keeps its own list.
 
 IS_WSL := $(shell grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null && echo 1)
 
