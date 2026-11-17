@@ -37,7 +37,8 @@ swap_pane_right = "ctrl+shift+alt+right"
 [[keys.command]]
 key = "shift+alt+w"
 type = "popup"
-command = "/home/phill/.local/bin/herdr-confirm-close-pane"
+# run via /bin/sh -c, so $HOME expands
+command = "$HOME/.local/bin/herdr-confirm-close-pane"
 description = "close pane (confirm)"
 width = 64
 height = 9

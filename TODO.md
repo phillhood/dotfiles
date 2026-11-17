@@ -53,8 +53,8 @@ Open follow-ups for the stow-based dotfiles.
       `arch2`, `arch3`, `arch_small`, `arch_old`) exposes only 2. One config file serves both, so slots
       1-2 colour the whole Arch logo *and* the Apple's top two bands — they stay sky/mauve to keep the
       Arch look, and 3-6 continue the sweep on the mac only.
-- [ ] Hardcoded Linux paths still ship in packages stowed on both, and are wrong on macOS:
-      `k9s/.config/k9s/config.yaml` `screenDumpDir: /home/phill/…` and
-      `herdr/.config/herdr/config.toml` `command = /home/phill/.local/bin/herdr-confirm-close-pane`.
-      Neither tool is known to support an include or `$HOME` expansion — check before choosing between
-      a per-OS package and an env-var indirection.
+- [x] Hardcoded `/home/phill/…` paths in packages stowed on every host. herdr runs `[[keys.command]]`
+      through `/bin/sh -c`, so `herdr/.config/herdr/config.toml` now uses `$HOME/.local/bin/…`. k9s's
+      `screenDumpDir` was dropped from `k9s/.config/k9s/config.yaml`: unset, it falls back to
+      `$XDG_STATE_HOME/k9s/screen-dumps`, the same path. The desktop-only packages (hypr, waybar,
+      swaync) still hardcode `/home/phill`.
