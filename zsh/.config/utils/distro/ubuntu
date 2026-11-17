@@ -1,4 +1,4 @@
-#!bin/zsh
+#!/bin/zsh
 
 ## SSH agent
 # Ubuntu's ssh-agent user unit only starts under an X session, so it never runs on WSL
