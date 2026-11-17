@@ -3,27 +3,24 @@
 # stowing ssh-linux/ or claude/ onto a host lacking ~/.ssh or ~/.claude can't point that
 # dir at this repo and leak a later-written key/credential into it.
 # ~/.ssh/config itself is deliberately not a package — see tools/canonical/.ssh/config.
-COMMON_PACKAGES := zsh starship git tmux ssh claude pi bat htop k9s helm ghostty btop cava fastfetch herdr nvim
-LINUX_PACKAGES := ssh-linux
-# Wayland desktop rice and GUI apps: Linux hosts with a desktop only, so skipped under WSL
-# (no compositor; the terminal runs on the Windows side).
-DESKTOP_PACKAGES := hypr waybar walker swaync ghostty-linux herdr-app
-DARWIN_PACKAGES := ghostty-darwin
-# Windows packages are linked by install.ps1, which keeps its own list.
-
 IS_WSL := $(shell grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null && echo 1)
 
 ifeq ($(shell uname -s),Darwin)
-PACKAGES := $(COMMON_PACKAGES) $(DARWIN_PACKAGES)
+OS ?= darwin
 else ifeq ($(IS_WSL),1)
-PACKAGES := $(COMMON_PACKAGES) $(LINUX_PACKAGES)
+OS ?= wsl
 else
-PACKAGES := $(COMMON_PACKAGES) $(LINUX_PACKAGES) $(DESKTOP_PACKAGES)
+OS ?= linux
 endif
+
+PACKAGES := $(shell awk -v os=$(OS) '/^[a-z]/ { for (i = 2; i <= NF; i++) if ($$i == os) print $$1 }' packages.conf)
 
 STOW := stow --no-folding --verbose --target=$(HOME)
 
-.PHONY: help install stow unstow restow adopt ssh-config
+.PHONY: help install stow unstow restow adopt ssh-config packages
+
+packages: ## List the packages this OS links (OS=linux|wsl|darwin|windows to override)
+	@printf '%s\n' $(PACKAGES)
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \

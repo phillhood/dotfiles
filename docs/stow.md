@@ -5,11 +5,16 @@ into this repo, so editing a file here changes the live config immediately.
 
 ## Per-OS packages
 
-`Makefile` splits packages into `COMMON_PACKAGES`, `LINUX_PACKAGES`, `DESKTOP_PACKAGES` and
-`DARWIN_PACKAGES`, selected on `uname -s` plus a WSL check (`microsoft` in
-`/proc/sys/kernel/osrelease`). The Wayland desktop set and GUI apps in `DESKTOP_PACKAGES` are stowed
-only on non-WSL Linux, since WSL has no compositor and the terminal runs on the Windows side. A new
-top-level package goes in whichever list it belongs to.
+`packages.conf` is the one list of packages: each line names a package and the OSes that link it,
+`linux`, `wsl`, `darwin` or `windows`. `Makefile` picks the OS on `uname -s` plus a WSL check
+(`microsoft` in `/proc/sys/kernel/osrelease`) and stows the matching lines; `install.ps1` links the
+`windows` lines. `linux` means Linux with a desktop: the Wayland rice and GUI apps are tagged `linux`
+but not `wsl`, since WSL has no compositor and the terminal runs on the Windows side.
+
+`make packages` prints the current host's set, and `make packages OS=darwin` any other. A new
+top-level package needs a line there; `tests/test_packages.py` fails on a package directory that isn't
+listed, an unknown OS tag, or `make`/`install.ps1` disagreeing with the file
+(`uv run python -m unittest tests/test_packages.py`).
 
 Where one config file needs a few different lines per OS, the shared file stays in the common package
 and the divergent keys go in a per-OS overlay package, loaded through the tool's own optional include.

@@ -9,7 +9,8 @@
 .EXAMPLE
   .\install.ps1                      # link every Windows package
   .\install.ps1 -Packages git,bat    # link only these
-  .\install.ps1 -Unlink              # remove links pointing into this repo
+  .\install.ps1 -List                # print the Windows packages from packages.conf
+  .\install.ps1 -Unlink             # remove links pointing into this repo
   .\install.ps1 -Adopt               # move existing real files into the repo, then link
 #>
 [CmdletBinding(DefaultParameterSetName = 'Link')]
@@ -17,16 +18,22 @@ param(
   [string[]]$Packages,
   [string]$Target = $HOME,
   [Parameter(ParameterSetName = 'Unlink')][switch]$Unlink,
-  [Parameter(ParameterSetName = 'Link')][switch]$Adopt
+  [Parameter(ParameterSetName = 'Link')][switch]$Adopt,
+  [switch]$List
 )
 
 $ErrorActionPreference = 'Stop'
 
-$CommonPackages = 'starship', 'git', 'ssh', 'claude', 'pi', 'bat', 'k9s', 'helm', 'nvim'
-$WindowsPackages = 'pwsh-windows'
-if (-not $Packages) { $Packages = $CommonPackages + $WindowsPackages }
-
 $Repo = $PSScriptRoot
+
+if (-not $Packages) {
+  $Packages = foreach ($line in Get-Content -LiteralPath (Join-Path $Repo 'packages.conf')) {
+    $fields = -split $line
+    if ($fields.Count -gt 1 -and -not $fields[0].StartsWith('#') -and ($fields[1..($fields.Count - 1)] -contains 'windows')) { $fields[0] }
+  }
+}
+if ($List) { $Packages; exit 0 }
+
 $Target = [IO.Path]::GetFullPath($Target).TrimEnd('\')
 $IsHome = $Target -eq [IO.Path]::GetFullPath($HOME).TrimEnd('\')
 $Documents = if ($IsHome) { [Environment]::GetFolderPath('MyDocuments') } else { Join-Path $Target 'Documents' }

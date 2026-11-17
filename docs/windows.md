@@ -18,7 +18,8 @@ Windows PowerShell 5.1 on a bare machine; pwsh 7 isn't required until the profil
 
 ## Packages
 
-`install.ps1` keeps its own list, since it can't read the Makefile's:
+`install.ps1` links the packages tagged `windows` in `packages.conf` (`.\install.ps1 -List` prints
+them):
 
 | | |
 | --- | --- |
