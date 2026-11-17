@@ -21,6 +21,7 @@ disabled = false
 Ubuntu = " "
 Arch = " "
 Macos = " "
+Windows = " "
 
 [directory]
 format = "[$path ]($style)"
