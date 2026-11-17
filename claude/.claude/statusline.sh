@@ -89,6 +89,8 @@ fields=$(jq -r '
 ' <<<"$payload" 2>/dev/null) || bail
 
 [[ -n $fields ]] || bail
+# Windows jq ends lines with CRLF.
+fields=${fields//$'\r'/}
 
 mapfile -t F <<<"$fields"
 model=${F[0]:-?}   ctx_pct=${F[1]:-0}   ctx_tok=${F[2]:-0}
