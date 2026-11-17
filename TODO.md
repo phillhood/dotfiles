@@ -65,9 +65,8 @@ Open follow-ups for the stow-based dotfiles.
       has been re-run on the work machine, so `DOTFILES_SSH` is set and `~/.ssh` is locked down.
 - [ ] On the work machine, `ssh-add $HOME\.ssh\id_rsa_aethon`, then push twice from a repo under
       `~/Dev/aethon/`; the second push shouldn't prompt for a passphrase.
-- [ ] Switch the devbox (WSL and Windows) to the layer layout and the `work` profile: unlink with the
-      old checkout (`make unstow` / `.\install.ps1 -Unlink`), pull, then `make install PROFILE=work` /
-      `.\install.ps1 -Profile work`.
+- [x] The devbox (WSL and Windows) is on the layer layout and the `work` profile.
+- [ ] **mac, one-time:** `make unstow` before pulling the layer layout, then pull and `make install`.
 - [ ] Optional: `platform/windows/pwsh` startup is ~1.55s against a 0.36s baseline, mostly the starship, atuin
       and zoxide init evals. Caching their generated scripts as the uv completion already is
       (regenerated when the exe is newer) would save about 200ms.
