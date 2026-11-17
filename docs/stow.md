@@ -1,37 +1,67 @@
 # Stow layout
 
-Each top-level directory is a stow package that mirrors `$HOME`. The deployed files are symlinks back
-into this repo, so editing a file here changes the live config immediately.
+Packages live in layers. A package is a directory named after its tool that mirrors `$HOME`; the
+deployed files are symlinks back into this repo, so editing a file here changes the live config
+immediately.
 
-## Per-OS and per-profile packages
+```
+platform/
+  shared/    every machine, Windows included
+  unix/      Linux, WSL and macOS
+  desktop/   Linux with a compositor (not WSL)
+  darwin/    macOS
+  windows/   Windows (linked by install.ps1)
+profile/
+  personal/  personal machines
+  work/      work machines
+```
 
-`packages.conf` is the one list of packages: each line names a package, the OSes that link it
-(`linux`, `wsl`, `darwin` or `windows`) and optionally a profile (see [Profiles](#profiles)). `Makefile` picks the OS on `uname -s` plus a WSL check
-(`microsoft` in `/proc/sys/kernel/osrelease`) and stows the matching lines; `install.ps1` links the
-`windows` lines. `linux` means Linux with a desktop: the Wayland rice and GUI apps are tagged `linux`
-but not `wsl`, since WSL has no compositor and the terminal runs on the Windows side.
+A machine links its platform layers plus its profile layer. The same tool can have a package in
+several layers, each adding its own files: `platform/shared/git` holds the shared git settings,
+`profile/personal/git` and `profile/work/git` the identity.
 
-`make packages` prints the current host's set, and `make packages OS=darwin PROFILE=work` any other.
-A new top-level package needs a line there; `tests/test_packages.py` fails on a package directory that
-isn't listed, an unknown tag, two selected packages shipping the same file, or `make`/`install.ps1`
-disagreeing with the file (`uv run python -m unittest tests/test_packages.py`).
+## Platform layers
+
+`layers.conf` maps each OS to its platform layers, and both `Makefile` and `install.ps1` read it:
+
+```
+linux    shared unix desktop
+wsl      shared unix
+darwin   shared unix darwin
+windows  shared windows
+```
+
+`Makefile` picks the OS on `uname -s` plus a WSL check (`microsoft` in `/proc/sys/kernel/osrelease`).
+`desktop` holds the Wayland rice and GUI apps, which WSL skips: it has no compositor, and the terminal
+runs on the Windows side.
+
+`make packages` prints the current host's package folders, and `make packages OS=darwin PROFILE=work`
+any other. A new package is a new folder in the right layer; nothing else lists it.
+`tests/test_packages.py` fails when `layers.conf` and the folders disagree, when two packages linked on
+the same machine ship the same file, or when `make` and `install.ps1` pick differently
+(`uv run python -m unittest tests/test_packages.py`).
 
 ## Profiles
 
-Each machine is `personal` or `work`. A package tagged with a profile is linked only on machines of
-that profile; a package with no profile tag is linked on both. Work machines get the same shell, editor
-and tools, without personal identities, hosts and keys:
+Each machine is `personal` or `work`. Work machines get the same shell, editor and tools, without
+personal identities, hosts and keys:
 
 | | personal | work |
 | --- | --- | --- |
-| git identity | `git-personal`: phillhood by default, shychedelic and Aethon by directory | `git-work`: Aethon by default, phillhood name and email under `~/Dev/phillhood/` with no key |
-| SSH hosts | `ssh` (forge), `ssh-linux` (homelab) | none |
-| Claude | `claude` + `claude-personal` (the `workflow` skill) | `claude` |
-| homelab helpers | `homelab`, `homelab-windows` (`kdeploy`) | none |
+| git identity | `git`: phillhood by default, shychedelic and Aethon by directory | `git`: Aethon by default, phillhood name and email under `~/Dev/phillhood/` with no key |
+| SSH hosts | `ssh`: forge and homelab | none |
+| Claude | `claude`: the `workflow` skill | none |
+| homelab helpers | `zsh`, `pwsh`: `kdeploy` | none |
 
-`git/.gitconfig` carries the shared settings and includes `~/.gitconfig-profile`, which each git
-profile package supplies. `.gitconfig-aethon` stays in `git`, since both profiles use it.
-`tests/test_git_ssh.py` checks the identity and key per directory for both profiles.
+A profile package is linked when the machine also links a platform package with the same name, or when
+no platform layer has a package by that name at all. So `profile/personal/zsh` extends `zsh` and is
+skipped on Windows, `profile/personal/pwsh` is the reverse, and `profile/personal/ssh`, with no
+platform counterpart, goes to every personal machine. Personal machines without the homelab key (the
+mac) still get the homelab hosts; `ssh` to them fails authentication, as it would with no entry.
+
+`platform/shared/git/.gitconfig` carries the shared settings and includes `~/.gitconfig-profile`, which
+each profile's `git` supplies. `.gitconfig-aethon` stays in `platform/shared/git`, since both profiles
+use it. `tests/test_git_ssh.py` checks the identity and key per directory for both profiles.
 
 The profile is saved in `~/.config/dotfiles/profile`; unset means `personal`. `make install
 PROFILE=work` (or `.\install.ps1 -Profile work`) sets it, and later runs reuse it. Switching an
@@ -42,26 +72,29 @@ make unstow                  # with the old profile, so its packages' links go
 make install PROFILE=work
 ```
 
-Moving a file between packages leaves its old link dangling, and stow won't clean it up. List them and
-delete before restowing:
+Moving a file between packages leaves its old link dangling, and stow won't clean it up. Unstow before
+pulling such a change, or list the dangling links afterwards and delete them before restowing:
 
 ```sh
 find ~ -xtype l -lname '*phillhood/dotfiles*' -not -path "$HOME/Dev/*"
 ```
 
-Where one config file needs a few different lines per OS, the shared file stays in the common package
-and the divergent keys go in a per-OS overlay package, loaded through the tool's own optional include.
-`ghostty` is the worked example: the shared `config` ends with `config-file = ?os.conf`, and
-`ghostty-darwin`/`ghostty-linux` each supply an `os.conf`. The `?` makes a missing overlay a no-op.
+## Per-OS overlays
 
-Two packages rather than both overlays shipped side by side, because Ghostty parses the full key schema
+Where one config file needs a few different lines per OS, the shared file stays in the common layer
+and the divergent keys go in the OS layer's package of the same name, loaded through the tool's own
+optional include. `ghostty` is the worked example: `platform/unix/ghostty/.config/ghostty/config` ends
+with `config-file = ?os.conf`, and `platform/desktop/ghostty` and `platform/darwin/ghostty` each supply
+an `os.conf`. The `?` makes a missing overlay a no-op.
+
+Two layers rather than both overlays shipped side by side, because Ghostty parses the full key schema
 on every platform: a macOS-only key like `macos-option-as-alt` is accepted, and inert, on Linux. With
 both files stowed, a key added to one overlay and forgotten in the other would apply on both OSes.
 
 Tools that load a single file use their own per-OS switch instead. `fastfetch` has no include, so its
 modules carry `"condition": { "system": ... }`.
 
-The shell follows the same split: `zsh/.zshrc` sources `zsh/.config/utils/distro/<os>`, keyed on
+The shell picks per OS at runtime instead: `.zshrc` sources `~/.config/utils/distro/<os>`, keyed on
 `/etc/os-release`'s `$ID` where it exists and lowercased `uname -s` otherwise. It runs before the
 `starship`/`fnm`/`fzf`/`atuin` init evals so Homebrew's `shellenv` is on `PATH` in time, and each eval is
 guarded by `command -v` so a host missing a tool still gets a working shell. Ubuntu/WSL gets `distro/ubuntu`,
@@ -71,7 +104,7 @@ Windows `PATH` entries into `$winpath`, searched only from `command_not_found_ha
 ## --no-folding
 
 Always pass `--no-folding` when calling `stow` directly; `make` already does. Without it, stowing
-`ssh-linux/` or `claude/` onto a host lacking `~/.ssh` or `~/.claude` symlinks that whole directory to
+`ssh/` or `claude/` onto a host lacking `~/.ssh` or `~/.claude` symlinks that whole directory to
 this repo, so a key or credential written there later lands inside it.
 
 ## Gitignore does not stop stow
@@ -80,13 +113,14 @@ this repo, so a key or credential written there later lands inside it.
 sitting in a package directory. Stow's built-in ignore list doesn't cover `*.bak`, so a stray backup
 inside a package is symlinked by `make stow`.
 
-`herdr/.stow-local-ignore` is the exception. It blocks the `config.toml.bak-keybind-v2-<epoch>` files
+`platform/unix/herdr/.stow-local-ignore` is the exception. It blocks the `config.toml.bak-keybind-v2-<epoch>` files
 `herdr config reset-keys` leaves behind, plus herdr's runtime state. Its patterns are anchored at both
 ends and matched per path segment, so `.*\.bak.*` is required; `\.bak.*$` matches nothing. A
 `.stow-local-ignore` also replaces stow's default ignore list for that package.
 
-herdr needs it because `HERDR_CONFIG_PATH` (exported in `zsh/.zshrc`) points herdr straight at the repo
-copy of its config. herdr writes `release-notes.json`, `session.json`, `.plugins.lock`, logs and sockets
+herdr needs it because `HERDR_CONFIG_PATH` (exported in `.zshrc`) points herdr straight at the repo
+copy of its config, `platform/unix/herdr/.config/herdr/config.toml`. A running herdr keeps the path it
+started with, so restart it after that path changes. herdr writes `release-notes.json`, `session.json`, `.plugins.lock`, logs and sockets
 beside its config, so they reappear in the package on every run. Stow would then try to link each over
 the real file already in `~/.config/herdr`, and because stow plans every package before applying any,
 that one conflict prints `All operations aborted` and leaves every package unlinked. The env var is also

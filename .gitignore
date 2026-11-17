@@ -1,33 +1,42 @@
 # ---- Public-repo secret guards (backstop; --no-folding already prevents dir-symlink leaks) ----
 # ssh: private keys + host state
-ssh/.ssh/id_*
-ssh/.ssh/*_key
-ssh/.ssh/*.pem
-ssh/.ssh/known_hosts*
-# claude package: credentials and per-user/runtime state
-claude/.claude/.credentials.json
-claude/.claude/history.jsonl
-claude/.claude/settings.local.json
+/platform/**/.ssh/id_*
+/platform/**/.ssh/*_key
+/platform/**/.ssh/*.pem
+/platform/**/.ssh/known_hosts*
+/profile/**/.ssh/id_*
+/profile/**/.ssh/*_key
+/profile/**/.ssh/*.pem
+/profile/**/.ssh/known_hosts*
+# claude packages: credentials and per-user/runtime state
+/platform/**/.claude/.credentials.json
+/platform/**/.claude/history.jsonl
+/platform/**/.claude/settings.local.json
+/profile/**/.claude/.credentials.json
+/profile/**/.claude/history.jsonl
+/profile/**/.claude/settings.local.json
 # settings.json is rewritten live by Claude Code → untracked; canonical copy in tools/canonical/
-claude/.claude/settings.json
+/platform/**/.claude/settings.json
+/profile/**/.claude/settings.json
 # plugin registry + marketplaces are runtime state Claude rewrites (breaks the symlink)
-claude/.claude/plugins/
+/platform/**/.claude/plugins/
+/profile/**/.claude/plugins/
 
 # ---- Desktop packages: build/backup/state, never track ----
 # hypr bundles a git-clone of split-monitor-workspaces (rebuilt by hyprpm)
-hypr/.config/hypr/plugins/
+platform/desktop/hypr/.config/hypr/plugins/
 # waybar keeps old config snapshots
-waybar/.config/waybar/backup/
+platform/desktop/waybar/.config/waybar/backup/
 # herdr rewrites sockets/logs/session state beside its config; only config.toml is tracked
-herdr/.config/herdr/*.log
-herdr/.config/herdr/*.sock
-herdr/.config/herdr/session.json
-herdr/.config/herdr/release-notes.json
-herdr/.config/herdr/.plugins.lock
+platform/unix/herdr/.config/herdr/*.log
+platform/unix/herdr/.config/herdr/*.sock
+platform/unix/herdr/.config/herdr/session.json
+platform/unix/herdr/.config/herdr/release-notes.json
+platform/unix/herdr/.config/herdr/.plugins.lock
 # `herdr config reset-keys` writes config.toml.bak-keybind-v2-<epoch>, which the
 # generic *.bak rule below does not match (it is not a .bak suffix)
-herdr/.config/herdr/*.bak*
-herdr-app/.config/herdr-app/mods/*/gpui-kit.d.ts
+platform/unix/herdr/.config/herdr/*.bak*
+platform/desktop/herdr-app/.config/herdr-app/mods/*/gpui-kit.d.ts
 # editor/backup copies anywhere
 *.bak
 

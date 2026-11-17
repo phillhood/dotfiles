@@ -9,8 +9,8 @@
 .EXAMPLE
   .\install.ps1                      # link every Windows package for this machine's profile
   .\install.ps1 -Profile work        # pick and remember the profile (personal or work)
-  .\install.ps1 -Packages git,bat    # link only these
-  .\install.ps1 -List                # print the packages it would link
+  .\install.ps1 -Packages git,bat    # link only these, from every layer that has them
+  .\install.ps1 -List                # print the package folders it would link
   .\install.ps1 -Unlink              # remove links pointing into this repo
   .\install.ps1 -Adopt               # move existing real files into the repo, then link
 #>
@@ -35,17 +35,31 @@ if (-not $MachineProfile) {
   if ($MachineProfile -notin 'personal', 'work') { throw "Unknown profile '$MachineProfile'; pass -Profile personal or -Profile work." }
 }
 
-$AllPackages = -not $Packages
-if ($AllPackages) {
-  $Packages = foreach ($line in Get-Content -LiteralPath (Join-Path $Repo 'packages.conf')) {
-    $fields = -split $line
-    if ($fields.Count -lt 2 -or $fields[0].StartsWith('#')) { continue }
-    $tags = $fields[1..($fields.Count - 1)]
-    $profileTags = @($tags | Where-Object { $_ -in 'personal', 'work' })
-    if ($tags -contains 'windows' -and (-not $profileTags -or $profileTags -contains $MachineProfile)) { $fields[0] }
+function Get-Packages([string]$Layer) {
+  $dir = Join-Path $Repo $Layer
+  if (Test-Path -LiteralPath $dir) {
+    Get-ChildItem -LiteralPath $dir -Directory | Sort-Object Name | ForEach-Object { "$Layer/$($_.Name)" }
   }
 }
-if ($List) { $Packages; exit 0 }
+function Get-Name([string]$Package) { ($Package -split '/')[-1] }
+
+$platformLayers = foreach ($line in Get-Content -LiteralPath (Join-Path $Repo 'layers.conf')) {
+  $fields = -split $line
+  if ($fields.Count -gt 1 -and $fields[0] -eq 'windows') { $fields[1..($fields.Count - 1)] }
+}
+$platformPackages = @(foreach ($layer in $platformLayers) { Get-Packages "platform/$layer" })
+$platformNames = @($platformPackages | ForEach-Object { Get-Name $_ })
+$allPlatformNames = @(Get-ChildItem -LiteralPath (Join-Path $Repo 'platform') -Directory | ForEach-Object { Get-Packages "platform/$($_.Name)" } | ForEach-Object { Get-Name $_ })
+$profilePackages = @(Get-Packages "profile/$MachineProfile" | Where-Object {
+  $name = Get-Name $_
+  $platformNames -contains $name -or $allPlatformNames -notcontains $name
+})
+
+$AllPackages = -not $Packages
+$Selected = @($platformPackages) + @($profilePackages)
+if (-not $AllPackages) { $Selected = @($Selected | Where-Object { $Packages -contains (Get-Name $_) }) }
+$SelectedNames = @($Selected | ForEach-Object { Get-Name $_ })
+if ($List) { $Selected; exit 0 }
 
 $IsHome = $Target -eq [IO.Path]::GetFullPath($HOME).TrimEnd('\')
 $Documents = if ($IsHome) { [Environment]::GetFolderPath('MyDocuments') } else { Join-Path $Target 'Documents' }
@@ -133,9 +147,9 @@ if (-not $Unlink) {
   }
   if ($IsHome) {
     Set-UserEnv 'XDG_CONFIG_HOME' (Join-Path $HOME '.config')
-    if ($Packages -contains 'git') { Set-DotfilesSsh }
+    if ($SelectedNames -contains 'git') { Set-DotfilesSsh }
   }
-  if ($AllPackages -or $Packages -contains 'ssh') { Install-SshConfig }
+  if ($AllPackages -or $SelectedNames -contains 'ssh') { Install-SshConfig }
   if ($AllPackages) {
     New-Item -ItemType Directory -Force (Split-Path $ProfileFile -Parent) | Out-Null
     Set-Content -LiteralPath $ProfileFile -Value $MachineProfile -Encoding ascii
@@ -143,9 +157,11 @@ if (-not $Unlink) {
 }
 
 $conflicts = 0
-foreach ($pkg in $Packages) {
-  $root = Join-Path $Repo $pkg
-  if (-not (Test-Path -LiteralPath $root -PathType Container)) { Write-Warning "no such package: $pkg"; continue }
+if (-not $AllPackages) {
+  foreach ($name in $Packages) { if ($SelectedNames -notcontains $name) { Write-Warning "no such package for this machine: $name" } }
+}
+foreach ($pkg in $Selected) {
+  $root = [IO.Path]::GetFullPath((Join-Path $Repo $pkg))
 
   foreach ($file in Get-ChildItem -LiteralPath $root -Recurse -File -Force) {
     if ($StowIgnore -contains $file.Name) { continue }

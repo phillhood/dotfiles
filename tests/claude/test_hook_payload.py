@@ -3,7 +3,7 @@ import pathlib
 import subprocess
 import unittest
 
-_HOOKS = pathlib.Path(__file__).resolve().parents[2] / "claude" / ".claude" / "hooks"
+_HOOKS = pathlib.Path(__file__).resolve().parents[2] / "platform" / "shared" / "claude" / ".claude" / "hooks"
 _SCRIPTS = ["uv-python.sh", "commit-msg-guard.sh"]
 _MALFORMED = [
     "not json",

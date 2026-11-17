@@ -38,7 +38,7 @@ class GitIdentityTest(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         home = pathlib.Path(tmp.name)
-        for package in ("git", f"git-{profile}"):
+        for package in ("platform/shared/git", f"profile/{profile}/git"):
             link_package(home, package)
         bin_dir = home / "bin"
         bin_dir.mkdir()

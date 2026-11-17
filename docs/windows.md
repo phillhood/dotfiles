@@ -2,8 +2,8 @@
 
 Windows has no `make` or `stow`, so `install.ps1` does the same job: each package mirrors `$HOME`, only
 files are linked, and directories are created as real directories (`--no-folding`). A leading
-`Documents\` in a package maps to the real Documents folder, which is how `pwsh-windows` reaches
-`Documents\PowerShell\profile.ps1`.
+`Documents\` in a package maps to the real Documents folder, which is how `platform/windows/pwsh`
+reaches `Documents\PowerShell\profile.ps1`.
 
 ```powershell
 git clone https://git.lab.phillhood.ca/phillhood/dotfiles.git $HOME\Dev\phillhood\dotfiles
@@ -33,19 +33,19 @@ change. Explicit grants set directly on a file inside are left alone.
 
 ## Packages
 
-`install.ps1` links the packages tagged `windows` in `packages.conf` for the machine's profile
-(`.\install.ps1 -List` prints them):
+`install.ps1` links the `windows` row of `layers.conf` plus the machine's profile layer
+(`.\install.ps1 -List` prints the folders):
 
-| | |
+| Layer | Packages |
 | --- | --- |
-| **Shared** | `starship` `git` `claude` `pi` `bat` `k9s` `helm` `nvim` |
-| **Windows** | `pwsh-windows` |
-| **Personal** | `git-personal` `ssh` `claude-personal` `homelab-windows` |
-| **Work** | `git-work` |
+| `platform/shared` | `bat` `claude` `git` `helm` `k9s` `nvim` `pi` `starship` |
+| `platform/windows` | `pwsh` |
+| `profile/personal` | `claude` `git` `pwsh` `ssh` (its `zsh` is skipped: Windows has no `zsh`) |
+| `profile/work` | `git` |
 
-Skipped: `zsh`, `tmux`, `herdr`, `htop`, `cava` and `ssh-linux` have no Windows use (they live in WSL);
-`ghostty` has no Windows build; `btop` on Windows is btop4win with a different config; `fastfetch`'s
-`command` modules are POSIX `sh`.
+Not on Windows: `platform/unix` (zsh, tmux, herdr, htop, cava live in WSL; `ghostty` has no Windows
+build; `btop` on Windows is btop4win with a different config; `fastfetch`'s `command` modules are POSIX
+`sh`) and `platform/desktop`.
 
 ## XDG_CONFIG_HOME
 
@@ -56,7 +56,7 @@ on Linux instead of needing Windows-only copies under `AppData`. Starship reads
 
 ## Shell
 
-`pwsh-windows` is the PowerShell 7 port of `zsh/.zshrc`: same prompt (starship, with the blank line
+`platform/windows/pwsh` is the PowerShell 7 port of `.zshrc`: same prompt (starship, with the blank line
 between prompts and the bar cursor), the same aliases as functions (`ls`/`ll`/`la` via eza, `cat` via
 bat, `grep` via rg, `py`/`pip` via uv, `k`/`kctx`/`kns`), and the same integrations (fnm, uv
 completions, fzf, atuin, direnv, zoxide as `cd`). Each is skipped when the tool is missing.
@@ -70,7 +70,7 @@ PSReadLine's `AddLine`. ConPTY reliably passes Alt+Enter through, which is what 
 `ssh`. Claude Code and zsh read `ESC CR` as a newline too.
 
 `~/.config/powershell/utils/*.ps1` mirrors `~/.config/utils`: `ask`, `emocode`, `shellbench`,
-`dockstats` and `docklogs`, plus `kdeploy` from `homelab-windows` on personal machines.
+`dockstats` and `docklogs`, plus `kdeploy` from `profile/personal/pwsh` on personal machines.
 
 The profile is `profile.ps1` (all hosts), so it also loads in the VS Code terminal. It returns
 straight away when pwsh only runs a command (`-c`, `-Command`, `-File`, `-EncodedCommand` without

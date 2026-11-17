@@ -1,7 +1,7 @@
 # swaync
 
 Notification daemon, started from Hyprland's autostart. Its own stow package:
-`swaync/.config/swaync/{config.json,style.css,notify-profile.py}`. Themed to the same
+`platform/desktop/swaync/.config/swaync/{config.json,style.css,notify-profile.py}`. Themed to the same
 Catppuccin Macchiato palette as waybar. See [`hyprland.md`](hyprland.md) for the layer
 rules and the fullscreen-aware popup monitor switching.
 

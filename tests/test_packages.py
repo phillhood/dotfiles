@@ -5,48 +5,64 @@ import subprocess
 import unittest
 
 _ROOT = pathlib.Path(__file__).resolve().parents[1]
-_OSES = {"linux", "wsl", "darwin", "windows"}
-_PROFILES = {"personal", "work"}
-_NOT_PACKAGES = {"assets", "docs", "tests", "tools"}
+_OSES = ["darwin", "linux", "windows", "wsl"]
+_PROFILES = ["personal", "work"]
 _STOW_IGNORE = {".stow-local-ignore", ".gitignore", "README.md", "LICENSE", "COPYING"}
 
 
-def manifest():
-    rows = []
-    for line in (_ROOT / "packages.conf").read_text().splitlines():
+def layers():
+    rows = {}
+    for line in (_ROOT / "layers.conf").read_text().splitlines():
         fields = line.split()
         if fields and not fields[0].startswith("#"):
-            rows.append((fields[0], set(fields[1:])))
+            rows[fields[0]] = fields[1:]
     return rows
 
 
+def packages(layer):
+    root = _ROOT / layer
+    return [f"{layer}/{p.name}" for p in sorted(root.iterdir()) if p.is_dir()] if root.is_dir() else []
+
+
 def expected(os, profile):
-    return [
-        pkg
-        for pkg, tags in manifest()
-        if os in tags and (not tags & _PROFILES or profile in tags)
+    platform = [p for layer in layers()[os] for p in packages(f"platform/{layer}")]
+    names = {p.rsplit("/", 1)[1] for p in platform}
+    every_name = {
+        p.rsplit("/", 1)[1]
+        for layer in (_ROOT / "platform").iterdir()
+        for p in packages(f"platform/{layer.name}")
+    }
+    personal = [
+        p for p in packages(f"profile/{profile}")
+        if p.rsplit("/", 1)[1] in names or p.rsplit("/", 1)[1] not in every_name
     ]
+    return platform + personal
 
 
-class ManifestTest(unittest.TestCase):
-    def test_every_package_dir_listed_once(self):
-        names = [pkg for pkg, _ in manifest()]
-        dirs = sorted(
-            p.name
-            for p in _ROOT.iterdir()
-            if p.is_dir() and not p.name.startswith(".") and p.name not in _NOT_PACKAGES
-        )
-        self.assertEqual(len(names), len(set(names)), "duplicate entries")
-        self.assertEqual(sorted(names), dirs)
+class LayersTest(unittest.TestCase):
+    def test_layers_conf_matches_folders(self):
+        self.assertEqual(sorted(layers()), _OSES)
+        used = {layer for row in layers().values() for layer in row}
+        folders = {p.name for p in (_ROOT / "platform").iterdir() if p.is_dir()}
+        self.assertEqual(used, folders)
+        self.assertEqual({p.name for p in (_ROOT / "profile").iterdir() if p.is_dir()}, set(_PROFILES))
 
-    def test_tags_valid(self):
-        for pkg, tags in manifest():
-            with self.subTest(pkg=pkg):
-                self.assertTrue(tags & _OSES, "no OS listed")
-                self.assertLessEqual(tags, _OSES | _PROFILES)
+    def test_no_loose_files_in_layers(self):
+        for group in ("platform", "profile"):
+            for layer in (_ROOT / group).iterdir():
+                with self.subTest(layer=f"{group}/{layer.name}"):
+                    self.assertEqual([f.name for f in layer.iterdir() if not f.is_dir()], [])
+
+    def test_profile_packages_follow_their_platform_package(self):
+        self.assertIn("profile/personal/zsh", expected("linux", "personal"))
+        self.assertNotIn("profile/personal/zsh", expected("windows", "personal"))
+        self.assertIn("profile/personal/pwsh", expected("windows", "personal"))
+        self.assertNotIn("profile/personal/pwsh", expected("darwin", "personal"))
+        for os in _OSES:
+            self.assertIn("profile/personal/ssh", expected(os, "personal"))
 
     def test_selected_packages_never_share_a_file(self):
-        for os, profile in itertools.product(sorted(_OSES), sorted(_PROFILES)):
+        for os, profile in itertools.product(_OSES, _PROFILES):
             with self.subTest(os=os, profile=profile):
                 owners = {}
                 for pkg in expected(os, profile):
@@ -57,8 +73,8 @@ class ManifestTest(unittest.TestCase):
                             self.assertNotIn(rel, owners, f"{pkg} and {owners.get(rel)}")
                             owners[rel] = pkg
 
-    def test_make_selects_manifest(self):
-        for os, profile in itertools.product(sorted(_OSES), sorted(_PROFILES)):
+    def test_make_selects_layers(self):
+        for os, profile in itertools.product(_OSES, _PROFILES):
             with self.subTest(os=os, profile=profile):
                 out = subprocess.run(
                     ["make", "-s", "packages", f"OS={os}", f"PROFILE={profile}"],
@@ -67,16 +83,17 @@ class ManifestTest(unittest.TestCase):
                 self.assertEqual(out.stderr, "")
                 self.assertEqual(out.stdout.split(), expected(os, profile))
 
-    def test_make_rejects_unknown_profile(self):
-        out = subprocess.run(
-            ["make", "-s", "packages", "PROFILE=nope"],
-            cwd=_ROOT, capture_output=True, text=True,
-        )
-        self.assertNotEqual(out.returncode, 0)
+    def test_make_rejects_unknown_profile_and_os(self):
+        for arg in ("PROFILE=nope", "OS=nope"):
+            with self.subTest(arg=arg):
+                out = subprocess.run(
+                    ["make", "-s", "packages", arg], cwd=_ROOT, capture_output=True, text=True
+                )
+                self.assertNotEqual(out.returncode, 0)
 
     @unittest.skipUnless(shutil.which("pwsh"), "pwsh not installed")
-    def test_install_ps1_selects_manifest(self):
-        for profile in sorted(_PROFILES):
+    def test_install_ps1_selects_layers(self):
+        for profile in _PROFILES:
             with self.subTest(profile=profile):
                 out = subprocess.run(
                     ["pwsh", "-NoProfile", "-File", str(_ROOT / "install.ps1"),

@@ -6,11 +6,12 @@
 blocks into it, and if it were a stow symlink those writes would land in this repo. Tracked hosts live in
 fragments instead:
 
-- `ssh/.ssh/config.d/forge.conf`: the Forgejo git host, on every personal machine.
-- `ssh-linux/.ssh/config.d/homelab.conf`: homelab hosts, personal Linux only, because they pin
-  `~/.ssh/id_ed25519_homelab` with `IdentitiesOnly yes` and that key is not on the mac.
+- `forge.conf`: the Forgejo git host.
+- `homelab.conf`: homelab hosts. They pin `~/.ssh/id_ed25519_homelab` with `IdentitiesOnly yes`, so on
+  a machine without that key (the mac) they fail authentication, as they would with no entry.
 
-Both are `personal` packages, so work machines get neither (see [Profiles](stow.md#profiles)).
+Both are in `profile/personal/ssh/.ssh/config.d/`, so every personal machine gets them and work
+machines get neither (see [Profiles](stow.md#profiles)).
 
 `~/.ssh/config` pulls them in with
 

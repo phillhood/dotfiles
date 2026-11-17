@@ -140,7 +140,7 @@ export SOPS_AGE_KEY_FILE="$HOME/.age/dev.txt"
 export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS} --walker-skip=.git,node_modules,target"
 # Read/write herdr's config straight out of the repo, so an in-app settings write
 # can never detach ~/.config/herdr/config.toml (still stowed) from the dotfiles copy
-export HERDR_CONFIG_PATH="$HOME/Dev/phillhood/dotfiles/herdr/.config/herdr/config.toml"
+export HERDR_CONFIG_PATH="$HOME/Dev/phillhood/dotfiles/platform/unix/herdr/.config/herdr/config.toml"
 
 # ---- Personal shell utils ----
 for file in $HOME/.config/utils/*(-.N); do

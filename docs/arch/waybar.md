@@ -1,6 +1,6 @@
 # Waybar
 
-`waybar/.config/waybar/`. Stowed into `~/.config/waybar/`.
+`platform/desktop/waybar/.config/waybar/`. Stowed into `~/.config/waybar/`.
 
 ## Why there are two config files
 

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 _ROOT = pathlib.Path(__file__).resolve().parents[2]
-_SCRIPT = _ROOT / "claude" / ".claude" / "hooks" / "commit-msg-guard.sh"
+_SCRIPT = _ROOT / "platform" / "shared" / "claude" / ".claude" / "hooks" / "commit-msg-guard.sh"
 
 _ABSENT = object()
 

@@ -1,6 +1,6 @@
 # Hyprland config
 
-`hypr/.config/hypr/hyprland.lua`, Hyprland 0.56's Lua config (`hl` API, stubs at
+`platform/desktop/hypr/.config/hypr/hyprland.lua`, Hyprland 0.56's Lua config (`hl` API, stubs at
 `/usr/share/hypr/stubs/hl.meta.lua`). This file holds the *why* behind the
 non-obvious lines there; the config itself stays comment-free.
 
@@ -171,7 +171,7 @@ failure into a loud one, which was the actual problem.
 ## Workspaces
 
 Handled by the `split-monitor-workspaces` plugin (vendored clone under
-`hypr/.config/hypr/plugins/`, gitignored, rebuilt by hyprpm). 10 workspaces,
+`platform/desktop/hypr/.config/hypr/plugins/`, gitignored, rebuilt by hyprpm). 10 workspaces,
 capped at 3 on the portrait side monitor.
 
 ## Outstanding

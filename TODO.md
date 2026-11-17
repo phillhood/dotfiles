@@ -7,7 +7,7 @@ Open follow-ups for the stow-based dotfiles.
       all packages and in `Makefile` `PACKAGES` (`575be02`).
 - [ ] Decide whether to track the last two: `~/.config/nwg-look/config` (282 B, GTK theme) and
       `~/.config/wireplumber/wireplumber.conf.d/` (drop-ins). Both still real dirs.
-- [ ] Machine-specific lines ship as-is in `hypr/.config/hypr/hyprland.lua`: monitors hardcoded to
+- [ ] Machine-specific lines ship as-is in `platform/desktop/hypr/.config/hypr/hyprland.lua`: monitors hardcoded to
       `DP-1`/`DP-2` (lines 9-10) and an Nvidia env block (lines 20-22). Stowing on another machine
       misconfigures it; a generic fallback sits commented out at line 14.
 
@@ -65,6 +65,9 @@ Open follow-ups for the stow-based dotfiles.
       has been re-run on the work machine, so `DOTFILES_SSH` is set and `~/.ssh` is locked down.
 - [ ] On the work machine, `ssh-add $HOME\.ssh\id_rsa_aethon`, then push twice from a repo under
       `~/Dev/aethon/`; the second push shouldn't prompt for a passphrase.
-- [ ] Optional: `pwsh-windows` startup is ~1.55s against a 0.36s baseline, mostly the starship, atuin
+- [ ] Switch the devbox (WSL and Windows) to the layer layout and the `work` profile: unlink with the
+      old checkout (`make unstow` / `.\install.ps1 -Unlink`), pull, then `make install PROFILE=work` /
+      `.\install.ps1 -Profile work`.
+- [ ] Optional: `platform/windows/pwsh` startup is ~1.55s against a 0.36s baseline, mostly the starship, atuin
       and zoxide init evals. Caching their generated scripts as the uv completion already is
       (regenerated when the exe is newer) would save about 200ms.

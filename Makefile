@@ -1,6 +1,6 @@
-# Stow-based dotfiles: each top-level dir is a package mirroring $HOME.
+# Stow-based dotfiles: platform/<layer>/<package> and profile/<profile>/<package>, each package mirroring $HOME.
 # --no-folding forces real dirs + per-file symlinks (never a whole-dir symlink), so
-# stowing ssh-linux/ or claude/ onto a host lacking ~/.ssh or ~/.claude can't point that
+# stowing ssh/ or claude/ onto a host lacking ~/.ssh or ~/.claude can't point that
 # dir at this repo and leak a later-written key/credential into it.
 # ~/.ssh/config itself is deliberately not a package — see tools/canonical/.ssh/config.
 IS_WSL := $(shell grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null && echo 1)
@@ -21,15 +21,23 @@ ifeq ($(filter $(PROFILE),personal work),)
 $(error PROFILE must be personal or work, got '$(PROFILE)')
 endif
 
-PACKAGES := $(shell awk -v os=$(OS) -v profile=$(PROFILE) '/^[a-z]/ { \
-	o = 0; tagged = 0; hit = 0; \
-	for (i = 2; i <= NF; i++) { \
-		if ($$i == os) o = 1; \
-		if ($$i == "personal" || $$i == "work") { tagged = 1; if ($$i == profile) hit = 1 } \
-	} \
-	if (o && (!tagged || hit)) print $$1 }' packages.conf)
+PLATFORM_LAYERS := $(shell awk -v os=$(OS) '$$1 == os { $$1 = ""; print }' layers.conf)
+ifeq ($(strip $(PLATFORM_LAYERS)),)
+$(error no layers for OS '$(OS)' in layers.conf)
+endif
+
+subdirs = $(patsubst %/,%,$(wildcard $(1)/*/))
+PLATFORM_PACKAGES := $(foreach l,$(PLATFORM_LAYERS),$(call subdirs,platform/$(l)))
+PLATFORM_NAMES := $(notdir $(PLATFORM_PACKAGES))
+ALL_PLATFORM_NAMES := $(notdir $(call subdirs,platform/*))
+follows = $(or $(filter $(1),$(PLATFORM_NAMES)),$(if $(filter $(1),$(ALL_PLATFORM_NAMES)),,$(1)))
+PROFILE_PACKAGES := $(foreach p,$(call subdirs,profile/$(PROFILE)),$(if $(call follows,$(notdir $(p))),$(p)))
+PACKAGES := $(PLATFORM_PACKAGES) $(PROFILE_PACKAGES)
+LAYER_DIRS := $(addprefix platform/,$(PLATFORM_LAYERS)) profile/$(PROFILE)
 
 STOW := stow --no-folding --verbose --target=$(HOME)
+in_layer = $(notdir $(filter $(1)/%,$(PACKAGES)))
+stow_each = $(foreach l,$(LAYER_DIRS),$(if $(call in_layer,$(l)),$(STOW) --dir=$(l) $(1) $(call in_layer,$(l)) &&)) true
 
 .PHONY: help install stow unstow restow adopt ssh-config packages
 
@@ -61,12 +69,12 @@ ssh-config: ## Install ~/.ssh/config from tools/canonical (never overwrites a re
 
 stow: ## Stow (symlink) all packages
 	@mkdir -p $(dir $(PROFILE_FILE)) && echo $(PROFILE) > $(PROFILE_FILE)
-	$(STOW) --restow $(PACKAGES)
+	$(call stow_each,--restow)
 
 unstow: ## Remove all symlinks
-	$(STOW) --delete $(PACKAGES)
+	$(call stow_each,--delete)
 
 restow: stow ## Re-link all packages (after adding/renaming files)
 
 adopt: ## One-time takeover of pre-existing real files as symlinks
-	$(STOW) --adopt $(PACKAGES)
+	$(call stow_each,--adopt)
