@@ -38,6 +38,8 @@ emocode() {
   print -r -- $out
   if [[ $OSTYPE == darwin* ]]; then
     print -rn -- $out | pbcopy
+  elif command -v clip.exe >/dev/null; then
+    print -rn -- $out | clip.exe
   else
     print -rn -- $out | wl-copy
   fi

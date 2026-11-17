@@ -41,6 +41,26 @@ zinit snippet OMZP::command-not-found
 zinit snippet OMZP::kubectl
 zinit snippet OMZP::kubectx
 
+# ---- Lazy fallback PATH ----
+# Dirs stashed in $winpath (WSL's Windows PATH, see distro/ubuntu) are only searched
+# when a command isn't found, before falling back to command-not-found's suggestions.
+if (( ${#winpath} )); then
+  (( $+functions[command_not_found_handler] )) &&
+    functions[_cnf_fallback_handler]=$functions[command_not_found_handler]
+  command_not_found_handler() {
+    local dir
+    for dir in $winpath; do
+      [[ -x $dir/$1 && ! -d $dir/$1 ]] && { "$dir/$1" "${@:2}"; return }
+    done
+    if (( $+functions[_cnf_fallback_handler] )); then
+      _cnf_fallback_handler "$@"
+    else
+      print -u2 "zsh: command not found: $1"
+      return 127
+    fi
+  }
+fi
+
 # ---- Completions ----
 autoload -Uz compinit && compinit
 zinit cdreplay -q
@@ -73,7 +93,13 @@ add-zsh-hook precmd _cursor_bar
 
 # ---- Shell integrations ----
 command -v fnm >/dev/null && eval "$(fnm env --use-on-cd --shell zsh)"
-command -v uv >/dev/null && eval "$(uv generate-shell-completion zsh)"
+# uv's completion script is large; cache it and regenerate when uv is updated
+if command -v uv >/dev/null; then
+  _uv_comp="${XDG_CACHE_HOME:-$HOME/.cache}/uv-completion.zsh"
+  [[ ! -s $_uv_comp || $commands[uv] -nt $_uv_comp ]] && uv generate-shell-completion zsh >| $_uv_comp
+  source $_uv_comp
+  unset _uv_comp
+fi
 command -v fzf >/dev/null && eval "$(fzf --zsh)"
 command -v atuin >/dev/null && eval "$(atuin init zsh --disable-up-arrow)"
 command -v direnv >/dev/null && eval "$(direnv hook zsh)"
@@ -125,7 +151,8 @@ done
 
 # ---- dotnet ----
 export DOTNET_ROOT=$HOME/.dotnet
-export PATH=$HOME/.dotnet:$PATH
+export PATH=$HOME/.dotnet:$HOME/.dotnet/tools:$PATH
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 # ---- pen.dev ----
 penopen() {

@@ -18,6 +18,7 @@ style = "fg:lavender"
 disabled = false
 
 [os.symbols]
+Ubuntu = " "
 Arch = " "
 Macos = " "
 

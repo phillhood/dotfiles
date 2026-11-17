@@ -1,0 +1,26 @@
+#!bin/zsh
+
+## SSH agent
+# Ubuntu's ssh-agent user unit only starts under an X session, so it never runs on WSL
+# or headless boxes. Reuse an agent at a fixed socket (one per login), starting it if
+# nothing answers. An already-working agent (desktop session, `ssh -A`) is left alone.
+ssh-add -l >/dev/null 2>&1
+if [ $? -eq 2 ]; then
+  export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-$HOME/.ssh}/ssh-agent.sock"
+  ssh-add -l >/dev/null 2>&1
+  if [ $? -eq 2 ]; then
+    rm -f "$SSH_AUTH_SOCK"
+    eval "$(ssh-agent -a "$SSH_AUTH_SOCK")" >/dev/null
+  fi
+fi
+
+## Aliases
+alias apt='sudo apt'
+
+## WSL: Windows PATH
+# WSL appends ~25 /mnt/c dirs, and scanning them over 9P makes every command lookup slow.
+# Stash them in $winpath; command_not_found_handler in .zshrc falls back to them.
+if [[ -n $WSL_DISTRO_NAME ]]; then
+  typeset -gaU winpath=(${(M)path:#/mnt/*})
+  path=(${path:#/mnt/*})
+fi
