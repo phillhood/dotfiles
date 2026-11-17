@@ -10,7 +10,7 @@
 
 ## Install
 
-Needs `stow` (`pacman -S stow` or `brew install stow`).
+Needs `stow` (`pacman -S stow`, `apt install stow` or `brew install stow`).
 
 ```sh
 git clone https://git.lab.phillhood.ca/phillhood/dotfiles.git ~/Dev/phillhood/dotfiles
@@ -38,7 +38,8 @@ Each top-level directory is a package mirroring `$HOME`. When calling `stow` dir
 | | |
 | --- | --- |
 | **Shared** | `zsh` `starship` `git` `tmux` `ssh` `claude` `pi` `nvim` `bat` `htop` `btop` `k9s` `helm` `ghostty` `cava` `fastfetch` `herdr` |
-| **Linux** | `hypr` `waybar` `walker` `swaync` `herdr-app` `ghostty-linux` `ssh-linux` |
+| **Linux** | `ssh-linux` |
+| **Linux desktop** (not WSL) | `hypr` `waybar` `walker` `swaync` `herdr-app` `ghostty-linux` |
 | **macOS** | `ghostty-darwin` |
 
 ## Docs

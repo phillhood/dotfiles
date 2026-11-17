@@ -5,8 +5,11 @@ into this repo, so editing a file here changes the live config immediately.
 
 ## Per-OS packages
 
-`Makefile` splits packages into `COMMON_PACKAGES`, `LINUX_PACKAGES` and `DARWIN_PACKAGES`, selected on
-`uname -s`. A new top-level package goes in whichever of the three lists it belongs to.
+`Makefile` splits packages into `COMMON_PACKAGES`, `LINUX_PACKAGES`, `DESKTOP_PACKAGES` and
+`DARWIN_PACKAGES`, selected on `uname -s` plus a WSL check (`microsoft` in
+`/proc/sys/kernel/osrelease`). The Wayland desktop set and GUI apps in `DESKTOP_PACKAGES` are stowed
+only on non-WSL Linux, since WSL has no compositor and the terminal runs on the Windows side. A new
+top-level package goes in whichever list it belongs to.
 
 Where one config file needs a few different lines per OS, the shared file stays in the common package
 and the divergent keys go in a per-OS overlay package, loaded through the tool's own optional include.
@@ -23,7 +26,9 @@ modules carry `"condition": { "system": ... }`.
 The shell follows the same split: `zsh/.zshrc` sources `zsh/.config/utils/distro/<os>`, keyed on
 `/etc/os-release`'s `$ID` where it exists and lowercased `uname -s` otherwise. It runs before the
 `starship`/`fnm`/`fzf`/`atuin` init evals so Homebrew's `shellenv` is on `PATH` in time, and each eval is
-guarded by `command -v` so a host missing a tool still gets a working shell.
+guarded by `command -v` so a host missing a tool still gets a working shell. Ubuntu/WSL gets `distro/ubuntu`,
+which starts an `ssh-agent` on a fixed socket (Ubuntu's user unit only runs under X) and moves WSL's
+Windows `PATH` entries into `$winpath`, searched only from `command_not_found_handler`.
 
 ## --no-folding
 
