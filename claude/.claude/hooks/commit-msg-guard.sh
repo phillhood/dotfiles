@@ -2,11 +2,12 @@
 
 input=$(cat)
 cmd=$(jq -r '.tool_input.command // empty' <<<"$input")
+cmd=${cmd//$'\r'/}
 
 [[ $cmd == *git*commit* ]] || exit 0
 
 CMD="$cmd" perl -e '
-  sub blank { /\G(?:[ \t]|\\\n)*/gc }
+  sub blank { /\G(?:[ \t]|[\\`]\n)*/gc }
   sub word {
     blank();
     /\G((?:"(?:\\.|[^"\\])*"|\x27[^\x27]*\x27|\\.|[^\s"\x27;&|()])+)/gcs ? $1 : undef;
@@ -23,8 +24,11 @@ CMD="$cmd" perl -e '
     while (1) {
       blank();
       last if /\G(?=[;&|\n()]|\z)/;
-      if (!$dd && !defined $msg && /\G(?:--message(?:=|(?:[ \t]|\\\n)+)|-[A-Za-z]*?m(?:[ \t]|\\\n)*)/gc) {
-        if (/\G"?\$\(cat[ \t]*<<-?[ \t]*(["\x27]?)(\w+)\1[ \t]*\n([^\n]*)/gc) {
+      if (!$dd && !defined $msg && /\G(?:--message(?:=|(?:[ \t]|[\\`]\n)+)|-[A-Za-z]*?m(?:[ \t]|[\\`]\n)*)/gc) {
+        if (/\G\@(["\x27])\n(.*?)\n\1\@/gcs) {
+          $msg = $2;
+          $eval = 0 if $1 eq "\x22" && $msg =~ /^[\$`]/;
+        } elsif (/\G"?\$\(cat[ \t]*<<-?[ \t]*(["\x27]?)(\w+)\1[ \t]*\n([^\n]*)/gc) {
           my $d = $2;
           $msg = $3;
           /\G.*?\n[ \t]*\Q$d\E[ \t]*(?=\n|\)|\z)/gcs and /\G\s*\)"?/gc;
@@ -59,7 +63,7 @@ CMD="$cmd" perl -e '
   $_ = $ENV{CMD};
   $at = 1;
   while ((pos() // 0) < length) {
-    next if /\G(?:[ \t]|\\\n)+/gc;
+    next if /\G(?:[ \t]|[\\`]\n)+/gc;
     if (/\G[;&|\n()]/gc) { $at = 1; next }
     my $w = word();
     if (!defined $w) { /\G./gcs; next }

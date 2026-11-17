@@ -231,6 +231,25 @@ class TestCommitMsgGuard(unittest.TestCase):
                 self.assertAllowed(command)
         self.assertBlocked("git commit -m '$MSG'")
 
+    def test_powershell_here_string_message(self):
+        for open_, close in (("@'", "'@"), ('@"', '"@')):
+            with self.subTest(quote=open_):
+                good = f"git commit -m {open_}\nfix: a\n\nBody line.\n{close}"
+                bad = f"git commit -m {open_}\nadd things\n{close}"
+                self.assertAllowed(good)
+                self.assertBlocked(bad)
+                self.assertBlocked(f'{good}; git commit -m "bad subject"')
+
+    def test_crlf_command_text(self):
+        self.assertAllowed(heredoc("fix: a", True).replace("\n", "\r\n"))
+        self.assertBlocked(heredoc("add things", True).replace("\n", "\r\n"))
+
+    def test_powershell_call_operator_and_continuation(self):
+        self.assertBlocked('& git commit -m "bad subject"')
+        self.assertAllowed('& git commit -m "fix: a"')
+        self.assertBlocked('git commit `\n  -m "bad subject"')
+        self.assertAllowed('git commit `\n  -m "fix: a"')
+
 
 if __name__ == "__main__":
     unittest.main()
