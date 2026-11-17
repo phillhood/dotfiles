@@ -92,15 +92,23 @@ function Install-SshConfig {
   }
 }
 
-function Set-XdgConfigHome {
-  $want = Join-Path $HOME '.config'
-  $have = [Environment]::GetEnvironmentVariable('XDG_CONFIG_HOME', 'User')
+function Set-UserEnv([string]$Name, [string]$Want) {
+  $have = [Environment]::GetEnvironmentVariable($Name, 'User')
   if (-not $have) {
-    [Environment]::SetEnvironmentVariable('XDG_CONFIG_HOME', $want, 'User')
-    $env:XDG_CONFIG_HOME = $want
-    Write-Host "env: set XDG_CONFIG_HOME=$want for this user (open a new shell to pick it up)"
-  } elseif ($have -ne $want) {
-    Write-Warning "env: XDG_CONFIG_HOME is $have, packages expect $want"
+    [Environment]::SetEnvironmentVariable($Name, $Want, 'User')
+    Set-Item "env:$Name" $Want
+    Write-Host "env: set $Name=$Want for this user (open a new shell to pick it up)"
+  } elseif ($have -ne $Want) {
+    Write-Warning "env: $Name is $have, packages expect $Want"
+  }
+}
+
+function Set-DotfilesSsh {
+  $ssh = Join-Path $env:SystemRoot 'System32\OpenSSH\ssh.exe'
+  if (Test-Path -LiteralPath $ssh) {
+    Set-UserEnv 'DOTFILES_SSH' ($ssh -replace '\\', '/')
+  } else {
+    Write-Warning 'env: Windows OpenSSH client not installed, git keeps using its bundled ssh'
   }
 }
 
@@ -108,7 +116,10 @@ if (-not $Unlink) {
   if (-not (Test-SymlinkCapable)) {
     throw 'Cannot create symlinks. Turn on Developer Mode (Settings > System > For developers) or run elevated.'
   }
-  if ($IsHome) { Set-XdgConfigHome }
+  if ($IsHome) {
+    Set-UserEnv 'XDG_CONFIG_HOME' (Join-Path $HOME '.config')
+    if ($Packages -contains 'git') { Set-DotfilesSsh }
+  }
   if ($Packages -contains 'ssh') { Install-SshConfig }
 }
 

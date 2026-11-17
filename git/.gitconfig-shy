@@ -3,4 +3,4 @@
 	email = shy@shychedelic.com
 	name = Shy
 [core]
-	sshCommand = ssh -i ~/.ssh/id_shy -o IdentitiesOnly=yes
+	sshCommand = ${DOTFILES_SSH:-ssh} -i ~/.ssh/id_shy -o IdentitiesOnly=yes

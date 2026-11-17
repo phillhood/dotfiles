@@ -89,11 +89,30 @@ jq -s '.[0] as $l | .[1] as $c | ($l * $c) | .permissions.allow = ((($l.permissi
   $HOME\.claude\settings.json tools\canonical\.claude\settings.json
 ```
 
-## Known gaps
+## git over SSH
 
-- **git over SSH.** `core.sshCommand = ssh ...` resolves to Git for Windows' bundled ssh, which can't
-  reach the Windows `ssh-agent` service. Keys still work through `-i`, but a passphrase prompts on
-  every push.
+Git for Windows runs `core.sshCommand` through its own `sh`, where a bare `ssh` is its bundled
+`/usr/bin/ssh`. That ssh can't reach the Windows `ssh-agent` service, so every push would prompt for
+the key's passphrase. The `sshCommand` in `.gitconfig`, `.gitconfig-shy` and `.gitconfig-aethon`
+therefore names the program as `${DOTFILES_SSH:-ssh}`, keeping each identity's own `-i` key.
+`install.ps1` sets the user variable `DOTFILES_SSH=C:/Windows/System32/OpenSSH/ssh.exe` when it's
+unset and the OpenSSH client is installed. On Linux, WSL and macOS the variable is unset and git runs
+plain `ssh` as before.
+
+`.gitconfig` also sets `ssh.variant = ssh`. Without it git can't tell from `${DOTFILES_SSH:-ssh}`
+which ssh it's running and probes with an extra `ssh -G` on every connection.
+
+`install.ps1` won't overwrite a `DOTFILES_SSH` that's already set. `tests/test_git_ssh.py` checks
+each identity's key and program, with the variable set and unset.
+
+One-time, per machine, after running `install.ps1` and opening a new shell:
+
+```powershell
+ssh-add $HOME\.ssh\id_phill        # and id_shy, id_rsa_aethon where those identities are used
+```
+
+A key in the older PEM format also needs its `.pub` beside it, or ssh asks for the passphrase
+instead of using the agent's copy.
 
 ## Terminal
 

@@ -9,8 +9,10 @@
 	conflictstyle = zdiff3
 [core]
 	excludesfile = ~/.gitignore_global
-	sshCommand = ssh -i ~/.ssh/id_phill -o IdentitiesOnly=yes
+	sshCommand = ${DOTFILES_SSH:-ssh} -i ~/.ssh/id_phill -o IdentitiesOnly=yes
 	editor = code --wait
+[ssh]
+	variant = ssh
 
 # Personal identity (default)
 [user]

@@ -3,7 +3,7 @@
 	email = phood@aethonaerial.com
 	name = Phill Hood
 [core]
-	sshCommand = ssh -i ~/.ssh/id_rsa_aethon -o IdentitiesOnly=yes
+	sshCommand = ${DOTFILES_SSH:-ssh} -i ~/.ssh/id_rsa_aethon -o IdentitiesOnly=yes
 [credential "https://dev.azure.com"]
 	helper =
 	helper = az-devops
