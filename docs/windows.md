@@ -13,6 +13,9 @@ cd $HOME\Dev\phillhood\dotfiles
 .\install.ps1 -Adopt     # one-time takeover of existing real files; review git diff after
 ```
 
+`git.lab.phillhood.ca` only resolves on the home LAN. Off it, clone the read-only GitHub mirror,
+`https://github.com/phillhood/dotfiles.git`, instead.
+
 Linking needs Developer Mode (Settings > System > For developers) or an elevated shell. Run it from
 Windows PowerShell 5.1 on a bare machine; pwsh 7 isn't required until the profile loads.
 
