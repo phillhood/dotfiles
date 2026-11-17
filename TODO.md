@@ -58,3 +58,15 @@ Open follow-ups for the stow-based dotfiles.
       `screenDumpDir` was dropped from `k9s/.config/k9s/config.yaml`: unset, it falls back to
       `$XDG_STATE_HOME/k9s/screen-dumps`, the same path. The desktop-only packages (hypr, waybar,
       swaync) still hardcode `/home/phill`.
+
+## Windows
+- [ ] Check the Windows Terminal canonical settings at the desk: PowerShell 7 is the default profile,
+      there's no duplicate "PowerShell" entry, and `ctrl+w` closes a pane.
+- [ ] SSH keys aren't on the Windows machine yet: `id_phill`, plus `id_shy` and `id_rsa_aethon` if
+      those identities are used there. `ssh-add` each one to the Windows agent once it's there.
+- [x] git over SSH uses Windows OpenSSH, so the `ssh-agent` service holds each identity's passphrase:
+      `core.sshCommand` runs `${DOTFILES_SSH:-ssh}`, set by `install.ps1` (`fff955d`). Re-run
+      `install.ps1` on the work machine to set `DOTFILES_SSH`.
+- [ ] Optional: `pwsh-windows` startup is ~1.55s against a 0.36s baseline, mostly the starship, atuin
+      and zoxide init evals. Caching their generated scripts as the uv completion already is
+      (regenerated when the exe is newer) would save about 200ms.
