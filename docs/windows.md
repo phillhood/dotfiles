@@ -61,7 +61,27 @@ PSFzf module, Tab opens fzf completion as fzf-tab does.
 `~/.config/powershell/utils/*.ps1` mirrors `~/.config/utils`: `ask`, `emocode`, `shellbench`,
 `dockstats`, `docklogs` and `kdeploy`.
 
-The profile is `profile.ps1` (all hosts), so it also loads in the VS Code terminal.
+The profile is `profile.ps1` (all hosts), so it also loads in the VS Code terminal. It returns
+straight away when pwsh only runs a command (`-c`, `-Command`, `-File`, `-EncodedCommand` without
+`-NoExit`), as zsh skips `.zshrc` for `ssh host cmd`: a one-off command starts in ~0.5s instead of
+~1.9s, and doesn't get the profile's aliases. VS Code starts pwsh with `-NoExit -Command`, so it still
+loads there.
+
+### SSH sessions
+
+Windows OpenSSH starts Windows PowerShell 5.1 unless told otherwise, and 5.1 reads
+`Documents\WindowsPowerShell\`, not this profile. One-time, per machine, from an elevated shell:
+
+```powershell
+winget install --id Microsoft.PowerShell --source winget --scope machine --installer-type wix
+Set-ItemProperty HKLM:\SOFTWARE\OpenSSH -Name DefaultShell -Value 'C:\Program Files\PowerShell\7\pwsh.exe'
+Set-ItemProperty HKLM:\SOFTWARE\OpenSSH -Name DefaultShellCommandOption -Value '-c'
+```
+
+The MSI matters: sshd can't reliably start the Store build, whose real path changes with each update.
+`DefaultShellCommandOption` reaches pwsh as a single argument, so `-NoProfile -Command` there fails
+every `ssh host cmd`; the profile's early return does that job instead. The setting is machine-wide,
+so it changes the shell for every account's SSH sessions.
 
 ## Software
 

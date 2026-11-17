@@ -1,5 +1,12 @@
 # profile.ps1 - managed by stow-style links (~/Dev/phillhood/dotfiles, pwsh-windows)
 
+$_pwshArgs = [Environment]::GetCommandLineArgs() | Select-Object -Skip 1
+if (($_pwshArgs -match '^-(c|command|cwa|commandwithargs|f|file|e|ec|encodedcommand)$') -and -not ($_pwshArgs -match '^-noe')) {
+  Remove-Variable _pwshArgs
+  return
+}
+Remove-Variable _pwshArgs
+
 $ESC = [char]27
 
 # ---- PATH ----
