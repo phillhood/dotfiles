@@ -1,7 +1,10 @@
 #!/bin/bash
 
 input=$(cat)
-cmd=$(jq -r '.tool_input.command // empty' <<<"$input")
+if ! cmd=$(jq -r '.tool_input.command // empty' <<<"$input" 2>/dev/null); then
+  echo "commit-msg-guard: could not parse the hook payload." >&2
+  exit 2
+fi
 cmd=${cmd//$'\r'/}
 
 [[ $cmd == *git*commit* ]] || exit 0

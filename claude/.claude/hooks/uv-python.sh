@@ -1,6 +1,9 @@
 #!/bin/bash
 
-cmd=$(jq -r '.tool_input.command // empty')
+if ! cmd=$(jq -r '.tool_input.command // empty' 2>/dev/null); then
+  echo "uv-python: could not parse the hook payload." >&2
+  exit 2
+fi
 cmd=${cmd//$'\r'/}
 
 if CMD="$cmd" perl -e 'exit !($ENV{CMD} =~ /(?:^|[;&|(\n]\s*|\b(?:then|do|exec|xargs)\s+)(?:python3?|pip3?)(?:\.exe)?(?:\s|$)/)'; then
