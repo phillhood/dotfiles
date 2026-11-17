@@ -76,5 +76,18 @@ writes the Claude hooks and statusline with CRLF, and bash fails on them with `$
   every push.
 - **Claude hooks.** Claude Code runs the hooks and statusline through Git Bash, so they need Git for
   Windows and `jq`. The `PreToolUse` hooks match `Bash` only and won't fire for the PowerShell tool.
-- **Terminal.** No Windows terminal config is tracked yet; Ghostty's settings would need porting to
-  Windows Terminal or WezTerm.
+
+## Terminal
+
+Windows Terminal stands in for Ghostty: Catppuccin Mocha, MesloLGS Nerd Font, bar cursor, 4px padding,
+`ctrl+w` closes the pane, and PowerShell 7 is the default profile. WT rewrites its `settings.json`
+whenever a setting changes in its UI, so it's a canonical copy in
+`tools/canonical/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/`, not a
+link. Copy it over on a new machine, after pwsh is installed:
+
+```powershell
+Copy-Item tools\canonical\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json `
+  $env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
+```
+
+When you change a setting in the WT UI that should follow you, copy it back into the canonical file.

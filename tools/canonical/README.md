@@ -19,3 +19,6 @@ touches it.
 - **`.claude/settings.json`** — Claude Code rewrites this live, so it's untracked from the `claude`
   package and kept here instead. Keep this copy free of `//` comments: it's JSON, not JSONC, so that a
   `jq`-based bootstrap merge can parse it.
+- **`AppData/.../Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json`** — Windows
+  Terminal rewrites this from its settings UI. Copied whole on a new Windows machine, not merged; see
+  `docs/windows.md`.
