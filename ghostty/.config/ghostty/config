@@ -15,6 +15,7 @@ shell-integration-features = ssh-terminfo
 
 # Keybinds
 keybind = ctrl+w=close_surface
+keybind = shift+enter=text:\x1b\r
 
 # Per-OS overlay (ghostty-darwin / ghostty-linux stow package)
 config-file = ?os.conf
