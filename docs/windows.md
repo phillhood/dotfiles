@@ -69,13 +69,27 @@ plus atuin and a Nerd Font (MesloLGS, as Ghostty uses) set in the terminal.
 `.gitattributes` forces LF on every checkout. Without it Git for Windows' default `core.autocrlf=true`
 writes the Claude hooks and statusline with CRLF, and bash fails on them with `$'\r': command not found`.
 
+## Claude Code
+
+The `claude` package is shared as-is. Claude Code runs its hooks and statusline through Git Bash, so
+they need Git for Windows and `jq`. Windows `jq` writes CRLF, so the hooks and statusline strip `\r`
+from its output. The `PreToolUse` hooks match `Bash|PowerShell`, and both parse the PowerShell forms
+Claude writes: `@'...'@` here-string commit messages, backtick line continuations, the `&` call
+operator and `python.exe`.
+
+Merge the canonical settings into `~/.claude/settings.json` rather than copying them, keeping the
+live `permissions.allow` entries (`*` replaces arrays):
+
+```powershell
+jq -s '.[0] as $l | .[1] as $c | ($l * $c) | .permissions.allow = ((($l.permissions.allow // []) + ($c.permissions.allow // [])) | unique)' `
+  $HOME\.claude\settings.json tools\canonical\.claude\settings.json
+```
+
 ## Known gaps
 
 - **git over SSH.** `core.sshCommand = ssh ...` resolves to Git for Windows' bundled ssh, which can't
   reach the Windows `ssh-agent` service. Keys still work through `-i`, but a passphrase prompts on
   every push.
-- **Claude hooks.** Claude Code runs the hooks and statusline through Git Bash, so they need Git for
-  Windows and `jq`. The `PreToolUse` hooks match `Bash` only and won't fire for the PowerShell tool.
 
 ## Terminal
 
