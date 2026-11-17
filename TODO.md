@@ -63,8 +63,6 @@ Open follow-ups for the stow-based dotfiles.
 - [x] git over SSH uses Windows OpenSSH, so the `ssh-agent` service holds each identity's passphrase:
       `core.sshCommand` runs `${DOTFILES_SSH:-ssh}`, set by `install.ps1` (`fff955d`). `install.ps1`
       has been re-run on the work machine, so `DOTFILES_SSH` is set and `~/.ssh` is locked down.
-- [ ] On the work machine, `ssh-add $HOME\.ssh\id_rsa_aethon`, then push twice from a repo under
-      `~/Dev/aethon/`; the second push shouldn't prompt for a passphrase.
 - [x] The devbox (WSL and Windows) is on the layer layout and the `work` profile.
 - [ ] **mac, one-time:** `make unstow` before pulling the layer layout, then pull and `make install`.
 - [ ] Optional: `platform/windows/pwsh` startup is ~1.55s against a 0.36s baseline, mostly the starship, atuin
