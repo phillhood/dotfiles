@@ -1,9 +1,5 @@
 # profile.ps1 - managed by stow-style links (~/Dev/phillhood/dotfiles, pwsh-windows)
 
-function Test-Command([string]$Name) {
-  [bool](Get-Command $Name -CommandType Application -ErrorAction SilentlyContinue)
-}
-
 $ESC = [char]27
 
 # ---- PATH ----
@@ -11,8 +7,22 @@ foreach ($dir in "$HOME\.local\bin", "$HOME\.cargo\bin", "$HOME\go\bin", "$HOME\
   if ((Test-Path $dir) -and ($env:PATH -split ';') -notcontains $dir) { $env:PATH = "$dir;$env:PATH" }
 }
 
+# Get-Command walks every PATH dir per call (~150ms each with winget's dirs); index once instead.
+$_exeIndex = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+foreach ($dir in $env:PATH -split ';') {
+  if (-not $dir -or -not [IO.Directory]::Exists($dir)) { continue }
+  foreach ($f in [IO.Directory]::EnumerateFiles($dir)) {
+    if ([IO.Path]::GetExtension($f) -in '.exe', '.cmd', '.bat', '.com') {
+      [void]$_exeIndex.Add([IO.Path]::GetFileNameWithoutExtension($f))
+    }
+  }
+}
+function Test-Command([string]$Name) { $_exeIndex.Contains($Name) }
+
+$_interactive = $Host.UI.SupportsVirtualTerminal -and -not [Console]::IsInputRedirected -and -not [Console]::IsOutputRedirected
+
 # ---- Line editing ----
-if (Get-Module -ListAvailable PSReadLine) {
+if ($_interactive) {
   Set-PSReadLineOption -EditMode Emacs -BellStyle None -HistoryNoDuplicates -MaximumHistoryCount 10000
   Set-PSReadLineOption -AddToHistoryHandler { param($line) -not $line.StartsWith(' ') }
   Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
@@ -40,7 +50,7 @@ function clear { Clear-Host; $global:_prompt_drawn = $false }
 if (Test-Command fnm) { fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression }
 if (Test-Command uv) {
   $_uvComp = "$HOME\.cache\uv-completion.ps1"
-  $_uvExe = (Get-Command uv -CommandType Application | Select-Object -First 1).Source
+  $_uvExe = (Get-Command uv -CommandType Application -TotalCount 1).Source
   if (-not (Test-Path $_uvComp) -or (Get-Item $_uvExe).LastWriteTime -gt (Get-Item $_uvComp).LastWriteTime) {
     New-Item -ItemType Directory -Force (Split-Path $_uvComp) | Out-Null
     uv generate-shell-completion powershell | Set-Content -Encoding utf8 $_uvComp
@@ -48,10 +58,10 @@ if (Test-Command uv) {
   . $_uvComp
   Remove-Variable _uvComp, _uvExe
 }
-if ((Test-Command fzf) -and (Get-Module -ListAvailable PSFzf)) {
-  Import-Module PSFzf
-  Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
-  Set-PSReadLineKeyHandler -Key Tab -ScriptBlock { Invoke-FzfTabCompletion }
+if ($_interactive -and (Test-Command fzf) -and
+    ($env:PSModulePath -split ';' | Where-Object { $_ -and (Test-Path "$_\PSFzf") })) {
+  Set-PSReadLineKeyHandler -Key Tab -ScriptBlock { Import-Module PSFzf; Invoke-FzfTabCompletion }
+  Set-PSReadLineKeyHandler -Chord Ctrl+t -ScriptBlock { Import-Module PSFzf; Invoke-FzfPsReadlineHandlerProvider }
 }
 if (Test-Command atuin) { atuin init powershell --disable-up-arrow | Out-String | Invoke-Expression }
 if (Test-Command direnv) { direnv hook pwsh | Out-String | Invoke-Expression }
