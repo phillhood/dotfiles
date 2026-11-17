@@ -5,7 +5,7 @@
 <h1 align="center">dotfiles</h1>
 
 <p align="center">
-  Arch Linux (Hyprland) and macOS, managed with <a href="https://www.gnu.org/software/stow/">GNU Stow</a>.
+  Arch Linux (Hyprland), macOS and Windows, managed with <a href="https://www.gnu.org/software/stow/">GNU Stow</a>.
 </p>
 
 ## Install
@@ -41,9 +41,11 @@ Each top-level directory is a package mirroring `$HOME`. When calling `stow` dir
 | **Linux** | `ssh-linux` |
 | **Linux desktop** (not WSL) | `hypr` `waybar` `walker` `swaync` `herdr-app` `ghostty-linux` |
 | **macOS** | `ghostty-darwin` |
+| **Windows** | `pwsh-windows`, linked by `install.ps1` |
 
 ## Docs
 
 - [Stow layout](docs/stow.md): per-OS packages, `--no-folding`, ignores, migrating a machine
+- [Windows](docs/windows.md): `install.ps1`, the PowerShell port of the shell, what's skipped
 - [SSH](docs/ssh.md): why `~/.ssh/config` isn't stowed, and the Forgejo remote
 - [Arch desktop](docs/arch/): Hyprland, waybar, swaync

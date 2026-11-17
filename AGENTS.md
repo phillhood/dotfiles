@@ -9,6 +9,9 @@ Personal dotfiles for Arch Linux and macOS, managed with GNU Stow.
   are skipped on macOS, `COMMON_PACKAGES` are stowed on both.
 - Files deployed into `$HOME` are symlinks back to this repo; edit the repo copy.
 - After adding, renaming, or removing package files, run `make restow`.
+- Windows has no make/stow: `install.ps1` links its own package list (`*-windows` packages plus the
+  portable shared ones). Add a package there too when it should reach Windows. See `docs/windows.md`.
+- Shell changes made in `zsh/` usually need the matching change in `pwsh-windows/`.
 - Do not track secrets, private keys, credentials, caches, sessions, or runtime state.
 
 ## Commands
