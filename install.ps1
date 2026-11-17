@@ -10,7 +10,7 @@
   .\install.ps1                      # link every Windows package
   .\install.ps1 -Packages git,bat    # link only these
   .\install.ps1 -List                # print the Windows packages from packages.conf
-  .\install.ps1 -Unlink             # remove links pointing into this repo
+  .\install.ps1 -Unlink              # remove links pointing into this repo
   .\install.ps1 -Adopt               # move existing real files into the repo, then link
 #>
 [CmdletBinding(DefaultParameterSetName = 'Link')]
