@@ -8,8 +8,8 @@ Open follow-ups for the stow-based dotfiles.
 - [ ] Decide whether to track the last two: `~/.config/nwg-look/config` (282 B, GTK theme) and
       `~/.config/wireplumber/wireplumber.conf.d/` (drop-ins). Both still real dirs.
 - [ ] Machine-specific lines ship as-is in `hypr/.config/hypr/hyprland.lua`: monitors hardcoded to
-      `DP-1`/`DP-2` (lines 10-11) and an Nvidia env block (lines 24-26). Stowing on another machine
-      misconfigures it; a generic fallback sits commented out at line 15.
+      `DP-1`/`DP-2` (lines 9-10) and an Nvidia env block (lines 20-22). Stowing on another machine
+      misconfigures it; a generic fallback sits commented out at line 14.
 
 ## SSH
 - [x] `~/.ssh/config` untracked and dropped from `PACKAGES` — colima and the AWS Toolkit for VSCode
@@ -19,9 +19,7 @@ Open follow-ups for the stow-based dotfiles.
 - [x] `make ssh-config` installs the skeleton at mode 600 when `~/.ssh/config` is absent or a dangling
       symlink, leaves a real file untouched, and warns when the `Include` line is missing. Wired into
       `make install`, so bootstrap needs no extra step.
-- [ ] **Arch, one-time:** `~/.ssh/config` there is still a symlink to the deleted `ssh/.ssh/config`, so
-      it dangles once this is pulled. Run `make ssh-config` (or `make install`) on that box — it detects
-      the dangling link and swaps in the skeleton. Until then every ssh host there stops resolving.
+- [x] **Arch, one-time:** the old `~/.ssh/config` symlink into the repo is replaced with a real file.
 - [ ] `~/.gitconfig` `includeIf` blocks pull in `~/.gitconfig-shy` (`~/.ssh/id_shy`) and
       `~/.gitconfig-aethon` (`~/.ssh/id_rsa_aethon`). Check which keys the mac has; a push under a
       missing identity fails there. Decide whether to install them or scope the includes per-OS.
@@ -62,11 +60,13 @@ Open follow-ups for the stow-based dotfiles.
 ## Windows
 - [ ] Check the Windows Terminal canonical settings at the desk: PowerShell 7 is the default profile,
       there's no duplicate "PowerShell" entry, and `ctrl+w` closes a pane.
-- [ ] SSH keys aren't on the Windows machine yet: `id_phill`, plus `id_shy` and `id_rsa_aethon` if
-      those identities are used there. `ssh-add` each one to the Windows agent once it's there.
+- [ ] SSH keys on the work machine: `id_rsa_aethon` is there, `id_phill` isn't (nor `id_shy`, if that
+      identity is used there). The Windows agent holds no keys yet: `ssh-add` each one.
 - [x] git over SSH uses Windows OpenSSH, so the `ssh-agent` service holds each identity's passphrase:
-      `core.sshCommand` runs `${DOTFILES_SSH:-ssh}`, set by `install.ps1` (`fff955d`). Re-run
-      `install.ps1` on the work machine to set `DOTFILES_SSH`.
+      `core.sshCommand` runs `${DOTFILES_SSH:-ssh}`, set by `install.ps1` (`fff955d`). `install.ps1`
+      has been re-run on the work machine, so `DOTFILES_SSH` is set and `~/.ssh` is locked down.
+- [ ] Once a key is in the agent, push twice from the work machine; the second push shouldn't prompt
+      for a passphrase.
 - [ ] Optional: `pwsh-windows` startup is ~1.55s against a 0.36s baseline, mostly the starship, atuin
       and zoxide init evals. Caching their generated scripts as the uv completion already is
       (regenerated when the exe is newer) would save about 200ms.
