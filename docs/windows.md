@@ -40,7 +40,7 @@ change. Explicit grants set directly on a file inside are left alone.
 | --- | --- |
 | `platform/shared` | `bat` `claude` `git` `helm` `k9s` `nvim` `pi` `starship` |
 | `platform/windows` | `pwsh` |
-| `profile/personal` | `claude` `git` `pwsh` `ssh` (its `zsh` is skipped: Windows has no `zsh`) |
+| `profile/personal` | `git` `pwsh` `ssh` (its `zsh` is skipped: Windows has no `zsh`) |
 | `profile/work` | `git` |
 
 Not on Windows: `platform/unix` (zsh, tmux, herdr, htop, cava live in WSL; `ghostty` has no Windows

@@ -45,7 +45,7 @@ layers (from `layers.conf`) plus its profile layer.
 | `platform/desktop` | Linux with a compositor | `ghostty` `herdr-app` `hypr` `swaync` `walker` `waybar` |
 | `platform/darwin` | macOS | `ghostty` |
 | `platform/windows` | Windows, via `install.ps1` | `pwsh` |
-| `profile/personal` | personal machines | `claude` `git` `pwsh` `ssh` `zsh` |
+| `profile/personal` | personal machines | `git` `pwsh` `ssh` `zsh` |
 | `profile/work` | work machines | `git` |
 
 Each machine is `personal` (the default) or `work`: `make install PROFILE=work` picks it once and

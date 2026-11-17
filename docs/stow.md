@@ -50,7 +50,6 @@ personal identities, hosts and keys:
 | --- | --- | --- |
 | git identity | `git`: phillhood by default, shychedelic and Aethon by directory | `git`: Aethon by default, phillhood name and email under `~/Dev/phillhood/` with no key |
 | SSH hosts | `ssh`: forge and homelab | none |
-| Claude | `claude`: the `workflow` skill | none |
 | homelab helpers | `zsh`, `pwsh`: `kdeploy` | none |
 
 A profile package is linked when the machine also links a platform package with the same name, or when
