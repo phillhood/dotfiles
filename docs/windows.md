@@ -58,6 +58,11 @@ PSReadLine stands in for the zsh plugins: Emacs keys, inline history suggestions
 accept), Ctrl+p/Ctrl+n prefix history search, and a leading space keeps a line out of history. With the
 PSFzf module, Tab opens fzf completion as fzf-tab does.
 
+Shift+Enter adds a line. A terminal sends Shift+Enter as a plain `\r`, the same as Enter, so Windows
+Terminal and Ghostty both send `ESC CR` (Alt+Enter) for it instead, and the profile binds Alt+Enter to
+PSReadLine's `AddLine`. ConPTY reliably passes Alt+Enter through, which is what makes it work over
+`ssh`. Claude Code and zsh read `ESC CR` as a newline too.
+
 `~/.config/powershell/utils/*.ps1` mirrors `~/.config/utils`: `ask`, `emocode`, `shellbench`,
 `dockstats`, `docklogs` and `kdeploy`.
 

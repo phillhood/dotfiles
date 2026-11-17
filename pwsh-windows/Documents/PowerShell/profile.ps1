@@ -37,6 +37,7 @@ if ($_interactive) {
   Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
   Set-PSReadLineKeyHandler -Chord Ctrl+p -Function HistorySearchBackward
   Set-PSReadLineKeyHandler -Chord Ctrl+n -Function HistorySearchForward
+  Set-PSReadLineKeyHandler -Chord Alt+Enter -Function AddLine
   try {
     Set-PSReadLineOption -PredictionSource History -PredictionViewStyle InlineView
     Set-PSReadLineKeyHandler -Chord Ctrl+f -Function AcceptSuggestion
