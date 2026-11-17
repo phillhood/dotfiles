@@ -7,7 +7,10 @@ Windows).
 
 - Each top-level directory is a stow package mirroring `$HOME`.
 - `packages.conf` lists every package and the OSes that link it: `linux` (desktop Linux), `wsl`,
-  `darwin`, `windows`. `Makefile` and `install.ps1` both read it; `make packages` prints this host's set.
+  `darwin`, `windows`, plus an optional profile, `personal` or `work`. `Makefile` and `install.ps1`
+  both read it; `make packages` prints this host's set. See `docs/stow.md#profiles`.
+- Personal identities, keys, hosts and homelab tooling go in a `personal` package, never in a shared
+  one: work machines link the shared packages.
 - Files deployed into `$HOME` are symlinks back to this repo; edit the repo copy.
 - After adding, renaming, or removing package files, run `make restow`.
 - Windows has no make/stow: `install.ps1` links the `windows` packages from `packages.conf`. See

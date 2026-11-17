@@ -1,0 +1,7 @@
+# Aethon identity (default)
+[include]
+	path = ~/.gitconfig-aethon
+
+# Personal name and email for the dotfiles, without the personal key
+[includeIf "gitdir:~/Dev/phillhood/"]
+	path = ~/.gitconfig-phillhood

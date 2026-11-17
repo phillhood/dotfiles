@@ -1,0 +1,5 @@
+[user]
+	email = phill@phillhood.ca
+	name = Phill Hood
+[core]
+	sshCommand = ${DOTFILES_SSH:-ssh}

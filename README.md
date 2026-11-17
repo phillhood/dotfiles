@@ -37,11 +37,15 @@ Each top-level directory is a package mirroring `$HOME`. When calling `stow` dir
 
 | | |
 | --- | --- |
-| **Shared** | `zsh` `starship` `git` `tmux` `ssh` `claude` `pi` `nvim` `bat` `htop` `btop` `k9s` `helm` `ghostty` `cava` `fastfetch` `herdr` |
-| **Linux** | `ssh-linux` |
+| **Shared** | `zsh` `starship` `git` `tmux` `claude` `pi` `nvim` `bat` `htop` `btop` `k9s` `helm` `ghostty` `cava` `fastfetch` `herdr` |
 | **Linux desktop** (not WSL) | `hypr` `waybar` `walker` `swaync` `herdr-app` `ghostty-linux` |
 | **macOS** | `ghostty-darwin` |
 | **Windows** | `pwsh-windows`, linked by `install.ps1` |
+| **Personal profile** | `git-personal` `ssh` `ssh-linux` `claude-personal` `homelab` `homelab-windows` |
+| **Work profile** | `git-work` |
+
+Each machine is `personal` (the default) or `work`: `make install PROFILE=work` picks it once and
+later runs remember it. See [Profiles](docs/stow.md#profiles).
 
 ## Docs
 

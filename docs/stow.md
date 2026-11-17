@@ -3,18 +3,51 @@
 Each top-level directory is a stow package that mirrors `$HOME`. The deployed files are symlinks back
 into this repo, so editing a file here changes the live config immediately.
 
-## Per-OS packages
+## Per-OS and per-profile packages
 
-`packages.conf` is the one list of packages: each line names a package and the OSes that link it,
-`linux`, `wsl`, `darwin` or `windows`. `Makefile` picks the OS on `uname -s` plus a WSL check
+`packages.conf` is the one list of packages: each line names a package, the OSes that link it
+(`linux`, `wsl`, `darwin` or `windows`) and optionally a profile (see [Profiles](#profiles)). `Makefile` picks the OS on `uname -s` plus a WSL check
 (`microsoft` in `/proc/sys/kernel/osrelease`) and stows the matching lines; `install.ps1` links the
 `windows` lines. `linux` means Linux with a desktop: the Wayland rice and GUI apps are tagged `linux`
 but not `wsl`, since WSL has no compositor and the terminal runs on the Windows side.
 
-`make packages` prints the current host's set, and `make packages OS=darwin` any other. A new
-top-level package needs a line there; `tests/test_packages.py` fails on a package directory that isn't
-listed, an unknown OS tag, or `make`/`install.ps1` disagreeing with the file
-(`uv run python -m unittest tests/test_packages.py`).
+`make packages` prints the current host's set, and `make packages OS=darwin PROFILE=work` any other.
+A new top-level package needs a line there; `tests/test_packages.py` fails on a package directory that
+isn't listed, an unknown tag, two selected packages shipping the same file, or `make`/`install.ps1`
+disagreeing with the file (`uv run python -m unittest tests/test_packages.py`).
+
+## Profiles
+
+Each machine is `personal` or `work`. A package tagged with a profile is linked only on machines of
+that profile; a package with no profile tag is linked on both. Work machines get the same shell, editor
+and tools, without personal identities, hosts and keys:
+
+| | personal | work |
+| --- | --- | --- |
+| git identity | `git-personal`: phillhood by default, shychedelic and Aethon by directory | `git-work`: Aethon by default, phillhood name and email under `~/Dev/phillhood/` with no key |
+| SSH hosts | `ssh` (forge), `ssh-linux` (homelab) | none |
+| Claude | `claude` + `claude-personal` (the `workflow` skill) | `claude` |
+| homelab helpers | `homelab`, `homelab-windows` (`kdeploy`) | none |
+
+`git/.gitconfig` carries the shared settings and includes `~/.gitconfig-profile`, which each git
+profile package supplies. `.gitconfig-aethon` stays in `git`, since both profiles use it.
+`tests/test_git_ssh.py` checks the identity and key per directory for both profiles.
+
+The profile is saved in `~/.config/dotfiles/profile`; unset means `personal`. `make install
+PROFILE=work` (or `.\install.ps1 -Profile work`) sets it, and later runs reuse it. Switching an
+existing machine:
+
+```sh
+make unstow                  # with the old profile, so its packages' links go
+make install PROFILE=work
+```
+
+Moving a file between packages leaves its old link dangling, and stow won't clean it up. List them and
+delete before restowing:
+
+```sh
+find ~ -xtype l -lname '*phillhood/dotfiles*' -not -path "$HOME/Dev/*"
+```
 
 Where one config file needs a few different lines per OS, the shared file stays in the common package
 and the divergent keys go in a per-OS overlay package, loaded through the tool's own optional include.

@@ -8,7 +8,8 @@ files are linked, and directories are created as real directories (`--no-folding
 ```powershell
 git clone https://git.lab.phillhood.ca/phillhood/dotfiles.git $HOME\Dev\phillhood\dotfiles
 cd $HOME\Dev\phillhood\dotfiles
-.\install.ps1            # link every Windows package
+.\install.ps1 -Profile work   # first run: pick personal or work; later runs remember it
+.\install.ps1            # link every Windows package for this machine's profile
 .\install.ps1 -Unlink    # remove the links
 .\install.ps1 -Adopt     # one-time takeover of existing real files; review git diff after
 ```
@@ -19,7 +20,10 @@ cd $HOME\Dev\phillhood\dotfiles
 Linking needs Developer Mode (Settings > System > For developers) or an elevated shell. Run it from
 Windows PowerShell 5.1 on a bare machine; pwsh 7 isn't required until the profile loads.
 
-`install.ps1` also locks down `~/.ssh` when it installs the `ssh` package. Created plainly, the folder
+Switching an existing machine to another profile: `.\install.ps1 -Unlink` first, while it still has
+the old profile, then `.\install.ps1 -Profile <new>`. See [Profiles](stow.md#profiles).
+
+`install.ps1` also locks down `~/.ssh` on a full run. Created plainly, the folder
 inherits the profile folder's permissions, and where another account can read the profile, Windows
 OpenSSH refuses `~/.ssh/config` with `Bad owner or permissions`. So it removes inheritance and grants
 full control only to the current user, SYSTEM and Administrators
@@ -29,13 +33,15 @@ change. Explicit grants set directly on a file inside are left alone.
 
 ## Packages
 
-`install.ps1` links the packages tagged `windows` in `packages.conf` (`.\install.ps1 -List` prints
-them):
+`install.ps1` links the packages tagged `windows` in `packages.conf` for the machine's profile
+(`.\install.ps1 -List` prints them):
 
 | | |
 | --- | --- |
-| **Shared** | `starship` `git` `ssh` `claude` `pi` `bat` `k9s` `helm` `nvim` |
+| **Shared** | `starship` `git` `claude` `pi` `bat` `k9s` `helm` `nvim` |
 | **Windows** | `pwsh-windows` |
+| **Personal** | `git-personal` `ssh` `claude-personal` `homelab-windows` |
+| **Work** | `git-work` |
 
 Skipped: `zsh`, `tmux`, `herdr`, `htop`, `cava` and `ssh-linux` have no Windows use (they live in WSL);
 `ghostty` has no Windows build; `btop` on Windows is btop4win with a different config; `fastfetch`'s
@@ -64,7 +70,7 @@ PSReadLine's `AddLine`. ConPTY reliably passes Alt+Enter through, which is what 
 `ssh`. Claude Code and zsh read `ESC CR` as a newline too.
 
 `~/.config/powershell/utils/*.ps1` mirrors `~/.config/utils`: `ask`, `emocode`, `shellbench`,
-`dockstats`, `docklogs` and `kdeploy`.
+`dockstats` and `docklogs`, plus `kdeploy` from `homelab-windows` on personal machines.
 
 The profile is `profile.ps1` (all hosts), so it also loads in the VS Code terminal. It returns
 straight away when pwsh only runs a command (`-c`, `-Command`, `-File`, `-EncodedCommand` without

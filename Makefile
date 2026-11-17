@@ -13,13 +13,27 @@ else
 OS ?= linux
 endif
 
-PACKAGES := $(shell awk -v os=$(OS) '/^[a-z]/ { for (i = 2; i <= NF; i++) if ($$i == os) print $$1 }' packages.conf)
+PROFILE_FILE := $(HOME)/.config/dotfiles/profile
+ifneq ($(origin PROFILE),command line)
+PROFILE := $(or $(shell cat $(PROFILE_FILE) 2>/dev/null),personal)
+endif
+ifeq ($(filter $(PROFILE),personal work),)
+$(error PROFILE must be personal or work, got '$(PROFILE)')
+endif
+
+PACKAGES := $(shell awk -v os=$(OS) -v profile=$(PROFILE) '/^[a-z]/ { \
+	o = 0; tagged = 0; hit = 0; \
+	for (i = 2; i <= NF; i++) { \
+		if ($$i == os) o = 1; \
+		if ($$i == "personal" || $$i == "work") { tagged = 1; if ($$i == profile) hit = 1 } \
+	} \
+	if (o && (!tagged || hit)) print $$1 }' packages.conf)
 
 STOW := stow --no-folding --verbose --target=$(HOME)
 
 .PHONY: help install stow unstow restow adopt ssh-config packages
 
-packages: ## List the packages this OS links (OS=linux|wsl|darwin|windows to override)
+packages: ## List the packages this host links (override with OS=... PROFILE=personal|work)
 	@printf '%s\n' $(PACKAGES)
 
 help: ## Show this help
@@ -46,6 +60,7 @@ ssh-config: ## Install ~/.ssh/config from tools/canonical (never overwrites a re
 		echo "ssh-config: WARNING no 'Include ~/.ssh/config.d/*.conf' line, tracked hosts will not load"
 
 stow: ## Stow (symlink) all packages
+	@mkdir -p $(dir $(PROFILE_FILE)) && echo $(PROFILE) > $(PROFILE_FILE)
 	$(STOW) --restow $(PACKAGES)
 
 unstow: ## Remove all symlinks

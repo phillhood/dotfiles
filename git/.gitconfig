@@ -9,24 +9,14 @@
 	conflictstyle = zdiff3
 [core]
 	excludesfile = ~/.gitignore_global
-	sshCommand = ${DOTFILES_SSH:-ssh} -i ~/.ssh/id_phill -o IdentitiesOnly=yes
 	editor = code --wait
 [ssh]
 	variant = ssh
 
-# Personal identity (default)
-[user]
-	email = phill@phillhood.ca
-	name = Phill Hood
+# Identity and SSH key: git-personal or git-work
+[include]
+	path = ~/.gitconfig-profile
 
-# Hobby identity
-[includeIf "gitdir:~/Dev/shychedelic/"]
-	path = ~/.gitconfig-shy
-
-# Aethon identity (Azure DevOps via ~/.ssh/id_rsa_aethon)
-[includeIf "gitdir:~/Dev/aethon/"]
-	path = ~/.gitconfig-aethon
-	
 [credential "https://github.com"]
 	helper = 
 	helper = !gh auth git-credential

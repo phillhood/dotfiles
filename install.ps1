@@ -7,9 +7,10 @@
   Documents folder. Directories are always created as real directories and only files
   are linked, matching stow --no-folding. Installs no software.
 .EXAMPLE
-  .\install.ps1                      # link every Windows package
+  .\install.ps1                      # link every Windows package for this machine's profile
+  .\install.ps1 -Profile work        # pick and remember the profile (personal or work)
   .\install.ps1 -Packages git,bat    # link only these
-  .\install.ps1 -List                # print the Windows packages from packages.conf
+  .\install.ps1 -List                # print the packages it would link
   .\install.ps1 -Unlink              # remove links pointing into this repo
   .\install.ps1 -Adopt               # move existing real files into the repo, then link
 #>
@@ -17,6 +18,7 @@
 param(
   [string[]]$Packages,
   [string]$Target = $HOME,
+  [Alias('Profile')][ValidateSet('personal', 'work')][string]$MachineProfile,
   [Parameter(ParameterSetName = 'Unlink')][switch]$Unlink,
   [Parameter(ParameterSetName = 'Link')][switch]$Adopt,
   [switch]$List
@@ -25,16 +27,26 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $Repo = $PSScriptRoot
+$Target = [IO.Path]::GetFullPath($Target).TrimEnd('\')
+$ProfileFile = Join-Path $Target '.config\dotfiles\profile'
 
-if (-not $Packages) {
+if (-not $MachineProfile) {
+  $MachineProfile = if (Test-Path -LiteralPath $ProfileFile) { (Get-Content -LiteralPath $ProfileFile -TotalCount 1).Trim() } else { 'personal' }
+  if ($MachineProfile -notin 'personal', 'work') { throw "Unknown profile '$MachineProfile'; pass -Profile personal or -Profile work." }
+}
+
+$AllPackages = -not $Packages
+if ($AllPackages) {
   $Packages = foreach ($line in Get-Content -LiteralPath (Join-Path $Repo 'packages.conf')) {
     $fields = -split $line
-    if ($fields.Count -gt 1 -and -not $fields[0].StartsWith('#') -and ($fields[1..($fields.Count - 1)] -contains 'windows')) { $fields[0] }
+    if ($fields.Count -lt 2 -or $fields[0].StartsWith('#')) { continue }
+    $tags = $fields[1..($fields.Count - 1)]
+    $profileTags = @($tags | Where-Object { $_ -in 'personal', 'work' })
+    if ($tags -contains 'windows' -and (-not $profileTags -or $profileTags -contains $MachineProfile)) { $fields[0] }
   }
 }
 if ($List) { $Packages; exit 0 }
 
-$Target = [IO.Path]::GetFullPath($Target).TrimEnd('\')
 $IsHome = $Target -eq [IO.Path]::GetFullPath($HOME).TrimEnd('\')
 $Documents = if ($IsHome) { [Environment]::GetFolderPath('MyDocuments') } else { Join-Path $Target 'Documents' }
 $StowIgnore = '.stow-local-ignore', '.gitignore', 'README.md', 'LICENSE', 'COPYING'
@@ -123,7 +135,11 @@ if (-not $Unlink) {
     Set-UserEnv 'XDG_CONFIG_HOME' (Join-Path $HOME '.config')
     if ($Packages -contains 'git') { Set-DotfilesSsh }
   }
-  if ($Packages -contains 'ssh') { Install-SshConfig }
+  if ($AllPackages -or $Packages -contains 'ssh') { Install-SshConfig }
+  if ($AllPackages) {
+    New-Item -ItemType Directory -Force (Split-Path $ProfileFile -Parent) | Out-Null
+    Set-Content -LiteralPath $ProfileFile -Value $MachineProfile -Encoding ascii
+  }
 }
 
 $conflicts = 0

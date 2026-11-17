@@ -1,0 +1,14 @@
+# Personal identity (default)
+[user]
+	email = phill@phillhood.ca
+	name = Phill Hood
+[core]
+	sshCommand = ${DOTFILES_SSH:-ssh} -i ~/.ssh/id_phill -o IdentitiesOnly=yes
+
+# Hobby identity
+[includeIf "gitdir:~/Dev/shychedelic/"]
+	path = ~/.gitconfig-shy
+
+# Aethon identity (Azure DevOps via ~/.ssh/id_rsa_aethon)
+[includeIf "gitdir:~/Dev/aethon/"]
+	path = ~/.gitconfig-aethon
