@@ -11,11 +11,13 @@ foreach ($dir in "$HOME\.local\bin", "$HOME\.cargo\bin", "$HOME\go\bin", "$HOME\
 $_exeIndex = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 foreach ($dir in $env:PATH -split ';') {
   if (-not $dir -or -not [IO.Directory]::Exists($dir)) { continue }
-  foreach ($f in [IO.Directory]::EnumerateFiles($dir)) {
-    if ([IO.Path]::GetExtension($f) -in '.exe', '.cmd', '.bat', '.com') {
-      [void]$_exeIndex.Add([IO.Path]::GetFileNameWithoutExtension($f))
+  try {
+    foreach ($f in [IO.Directory]::EnumerateFiles($dir)) {
+      if ([IO.Path]::GetExtension($f) -in '.exe', '.cmd', '.bat', '.com') {
+        [void]$_exeIndex.Add([IO.Path]::GetFileNameWithoutExtension($f))
+      }
     }
-  }
+  } catch {}
 }
 function Test-Command([string]$Name) { $_exeIndex.Contains($Name) }
 
