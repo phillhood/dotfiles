@@ -77,6 +77,9 @@ function Test-SymlinkCapable {
 function Install-SshConfig {
   $sshDir = Join-Path $Target '.ssh'
   New-Item -ItemType Directory -Force $sshDir | Out-Null
+  $me = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+  $out = icacls $sshDir /inheritance:r /grant:r "*${me}:(OI)(CI)F" '*S-1-5-18:(OI)(CI)F' '*S-1-5-32-544:(OI)(CI)F' 2>&1
+  if ($LASTEXITCODE) { throw "icacls failed on ${sshDir}: $out" }
   $cfg = Join-Path $sshDir 'config'
   $cur = Get-Existing $cfg
   if (-not $cur) {

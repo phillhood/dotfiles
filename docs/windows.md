@@ -19,6 +19,14 @@ cd $HOME\Dev\phillhood\dotfiles
 Linking needs Developer Mode (Settings > System > For developers) or an elevated shell. Run it from
 Windows PowerShell 5.1 on a bare machine; pwsh 7 isn't required until the profile loads.
 
+`install.ps1` also locks down `~/.ssh` when it installs the `ssh` package. Created plainly, the folder
+inherits the profile folder's permissions, and where another account can read the profile, Windows
+OpenSSH refuses `~/.ssh/config` with `Bad owner or permissions`. So it removes inheritance and grants
+full control only to the current user, SYSTEM and Administrators
+(`icacls /inheritance:r /grant:r ...:(OI)(CI)F`), by SID so it works on non-English Windows. Files
+inside inherit that and lose any other account's inherited access, including files from before the
+change. Explicit grants set directly on a file inside are left alone.
+
 ## Packages
 
 `install.ps1` links the packages tagged `windows` in `packages.conf` (`.\install.ps1 -List` prints
