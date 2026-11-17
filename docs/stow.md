@@ -117,13 +117,15 @@ inside a package is symlinked by `make stow`.
 ends and matched per path segment, so `.*\.bak.*` is required; `\.bak.*$` matches nothing. A
 `.stow-local-ignore` also replaces stow's default ignore list for that package.
 
-herdr needs it because `HERDR_CONFIG_PATH` (exported in `.zshrc`) points herdr straight at the repo
-copy of its config, `platform/unix/herdr/.config/herdr/config.toml`. A running herdr keeps the path it
-started with, so restart it after that path changes. herdr writes `release-notes.json`, `session.json`, `.plugins.lock`, logs and sockets
+herdr needs it because `HERDR_CONFIG_PATH` points herdr straight at the repo copy of its config.
+`.zshrc` resolves it from the stowed `~/.config/herdr/config.toml` link, so it follows the package
+wherever it moves. A shell started before a move still exports the old path, and a herdr server
+started from that shell finds no config there, writes a stub default config at the old path and runs
+with default keys and theme. After moving the herdr package, open new shells before restarting herdr,
+and delete the stub. herdr writes `release-notes.json`, `session.json`, `.plugins.lock`, logs and sockets
 beside its config, so they reappear in the package on every run. Stow would then try to link each over
 the real file already in `~/.config/herdr`, and because stow plans every package before applying any,
-that one conflict prints `All operations aborted` and leaves every package unlinked. The env var is also
-why the repo must be cloned to `~/Dev/phillhood/dotfiles` on every host.
+that one conflict prints `All operations aborted` and leaves every package unlinked.
 
 ## Repo-only files
 

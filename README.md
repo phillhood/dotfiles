@@ -18,8 +18,8 @@ cd ~/Dev/phillhood/dotfiles
 make install
 ```
 
-Clone to exactly that path; `.zshrc` hardcodes it. On a work machine, `make install PROFILE=work`. `make install` only links config, it installs
-no software. To provision a bare machine, see [`phillhood/bootstrap`](https://github.com/phillhood/bootstrap).
+On a work machine, `make install PROFILE=work`. `make install` only links config, it installs no
+software. To provision a bare machine, see [`phillhood/bootstrap`](https://github.com/phillhood/bootstrap).
 
 ## Usage
 
