@@ -20,12 +20,12 @@ if { [ -t 1 ] || [ -n "$HERDR_CONFIRM_FORCE_COLOR" ]; } && [ -z "$NO_COLOR" ]; t
 	yellow='\033[38;2;238;212;159m'
 	red='\033[38;2;237;135;150m'
 	green='\033[38;2;166;218;149m'
-	cap_y='\033[48;2;198;160;246;38;2;30;32;48m y \033[0m'
+	cap_y='\033[48;2;198;160;246;38;2;30;32;48m y ⏎ \033[0m'
 	cap_n='\033[48;2;73;77;100;38;2;202;211;245m esc \033[0m'
 	reset='\033[0m'
 else
 	accent='' text='' dim='' yellow='' red='' green='' reset=''
-	cap_y='[y]' cap_n='[esc]'
+	cap_y='[y/enter]' cap_n='[esc]'
 fi
 
 cols=$(stty size 2>/dev/null | cut -d' ' -f2)
@@ -79,11 +79,13 @@ if stty_saved=$(stty -g 2>/dev/null); then
 	stty raw -echo 2>/dev/null
 	reply=$(dd bs=1 count=1 2>/dev/null)
 	stty "$stty_saved" 2>/dev/null
+	[ -n "$reply" ] || exit 0
 else
-	read -r reply
+	read -r reply || exit 0
 fi
 
+cr=$(printf '\r')
 case "$reply" in
-y | Y) exec "$herdr" pane close "$pane" ;;
+y | Y | "$cr" | '') exec "$herdr" pane close "$pane" ;;
 *) exit 0 ;;
 esac
